@@ -45,6 +45,7 @@ const sections: Section[] = [
       lab(R`the vertical line at the minimum of the held-out (test) error`),
       warn(R`Larger ridge $\lambda$ means LOWER complexity. So increasing $\lambda$ moves you to the LEFT on this axis.`),
     ],
+    manim: 'PolynomialDegree', // animations/regression.py: fits of degree 1, 3 and 9, and training vs validation error
     rows: [],
   },
   {
@@ -75,6 +76,7 @@ const sections: Section[] = [
       text(R`Fit on $K-1$ folds and score the remaining fold. Rotate the held-out fold so each fold is scored once.`),
       lab(R`slide 58 figure: five bars, each with a different block marked Val.`),
     ],
+    manim: 'KFoldCV', // animations/regression.py: the validation fold moving through the data
     rows: [
       {
         eq: R`\text{fit }k:\ \text{train on all folds except }k,\ \text{score on fold }k,\qquad k=1,\dots,K`,
@@ -121,6 +123,7 @@ const sections: Section[] = [
     slides: [slide('II', 7, 'Standardise features before regularising')],
     slideNote: 'Row 1 is the slide. Rows 2 and 3 are added to show why the result has mean 0 and unit variance.',
     pre: [text(R`Feature $j$: training mean $\mu_j$ and standard deviation $s_j>0$.`)],
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`\widetilde x_j=\frac{x_j-\mu_j}{s_j}`,
@@ -156,6 +159,7 @@ const sections: Section[] = [
     slides: [slide('II', 7, 'Standardise features before regularising')],
     slideNote: 'The slide gives the substitution (row 2). Rows 1 and 3 are added to show why the predictions do not change.',
     pre: [text(R`Scale feature $x_j$ by a nonzero factor $c$ and its coefficient $w_j$ by $1/c$.`)],
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`\hat y=w_0+\sum_{j=1}^{D}w_jx_j=\mathbf w^\top\mathbf x`,
@@ -186,6 +190,7 @@ const sections: Section[] = [
     slides: [slide('II', 7, 'Standardise features before regularising')],
     slideNote: 'Rows 1 to 3 are the slide. The units example and the callout are added.',
     pre: [term('Same predictions, different ridge penalty')],
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`\lambda w_j^2\ \mapsto\ \lambda\Big(\frac{w_j}{c}\Big)^2=\frac{\lambda w_j^2}{c^2}`,

@@ -163,6 +163,7 @@ const sections: Section[] = [
     why: R`The loss has the same form as before with $\Phi$ in place of $X$. So we do not need a new derivation: every step of the matrix least-squares topic goes through with $X\to\Phi$ and $D+1\to M$.`,
     slides: [slide('I', 48, 'A design matrix for nonlinear features')],
     slideNote: R`Rows 2 and 3 are added: they apply the result of the matrix least-squares topic with $\Phi$ in place of $X$. The slide says only "Minimise it over the same coefficient vector".`,
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`L(\mathbf w)=\sum_{i=1}^{N}\big(y_i-\mathbf w^\top\boldsymbol\phi(\mathbf x_i)\big)^2=\lVert\mathbf y-\Phi\mathbf w\rVert_2^2`,

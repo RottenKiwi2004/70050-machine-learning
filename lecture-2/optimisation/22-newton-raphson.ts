@@ -44,6 +44,7 @@ const sections: Section[] = [
     pre: [
       text('A narrow valley has very different curvature in different parameter directions. One rate can make progress slow or oscillatory.'),
     ],
+    manim: 'GDvsNewton', // animations/optimisation.py: gradient descent zig-zags; Newton jumps
     rows: [
       {
         eq: R`\text{Initialize: }\mathbf w_0,\qquad\text{Update: }\mathbf w_{t+1}=\mathbf w_t-\htmlClass{c-red}{\eta_t}\nabla L(\mathbf w_t)`,
@@ -72,6 +73,7 @@ const sections: Section[] = [
     why: R`Least squares is the cleanest example: gradient descent can need many zig-zag steps, yet the loss is exactly quadratic, so a method that uses its curvature lands on the answer in one step. We recall the solution to check this.`,
     slides: [slide('L2', 50, 'Curvature in least squares'), slide('L2', 51, 'Recall: the least-squares solution')],
     slideNote: R`Slide 50 figure: gradient descent zig-zagging on least-squares contours. Rows 5 and 6 (the Hessian and the one-step Newton check) are added.`,
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`L(\mathbf w)=(\mathbf y-X\mathbf w)^\top(\mathbf y-X\mathbf w)=\boldsymbol\epsilon^\top\boldsymbol\epsilon,\qquad\boldsymbol\epsilon=\mathbf y-X\mathbf w`,
@@ -154,6 +156,8 @@ const sections: Section[] = [
       slide('L2', 57, "Newton's method in one dimension"),
     ],
     slideNote: R`Slides 53 to 56 are figures: blue loss, red quadratic model, black the current iterate, magenta the model's minimum. Read off: $1.7\to0.48$, then $0.48\to0.65$, then $0.65\to0.70$, then black and magenta coincide. The iterate table (row 5) is added and reproduces these.`,
+    derive: true, // the rows as an animated derivation, drawn in the page
+    manim: 'Newton1D', // animations/optimisation.py: each Newton step jumps to the minimum of a parabola
     rows: [
       {
         eq: R`\text{Initial parameter: }w_0`,
@@ -222,6 +226,7 @@ const sections: Section[] = [
     why: R`Exactly as in one dimension: set the gradient of the quadratic model to zero and solve for the step. Dividing by the curvature becomes solving a linear system with the Hessian, which rescales every direction at once and removes the narrow-valley problem.`,
     slides: [slide('L2', 59, "Newton's method in several dimensions")],
     slideNote: R`Row 3's intermediate step and the bowl example (row 5) are added.`,
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`\text{Initial parameter: }\mathbf w_0,\qquad q_t(\mathbf w)=L(\mathbf w_t)+\mathbf d^\top\nabla L(\mathbf w_t)+\tfrac12\mathbf d^\top H_t\mathbf d`,
@@ -312,6 +317,7 @@ const sections: Section[] = [
       slide('L2', 149, 'Newton for logistic regression gives IRLS'),
     ],
     slideNote: R`Slide 145 lists the appendix (reading: Murphy §10.2.6, iteratively reweighted least squares). Rows 8 to 10 spell out the algebra between the two lines of slide 149.`,
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`\frac{\partial L}{\partial w_k}=\sum_{i=1}^{N}(p_i-y_i)\,x_{ik}`,

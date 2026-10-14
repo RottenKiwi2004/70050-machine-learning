@@ -161,6 +161,7 @@ const sections: Section[] = [
       text(R`$P$: real-world distribution. $(\mathbf X,Y)$: a fresh pair, independent of training.`),
       text(R`Hold the fitted function fixed. $R(f)$ is its population risk.`),
     ],
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`R(f)=\mathbb E_{(\mathbf X,Y)\sim P}\big[\ell(Y,f(\mathbf X))\big]`,
@@ -196,6 +197,7 @@ const sections: Section[] = [
     pre: [
       text(R`Reserve fresh validation pairs from the same population. $\mathcal V$: validation sample. $N_{\text{val}}$: its size. Superscript val marks its values.`),
     ],
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`\mathcal V=\{(\mathbf x_i^{\text{val}},y_i^{\text{val}})\}_{i=1}^{N_{\text{val}}}`,
@@ -273,6 +275,7 @@ const sections: Section[] = [
       lab(R`Weak ridge, $\lambda=0.0001$: grey fits spread out a lot, especially near the ends; the red mean lies on top of the green true mean.`),
       lab(R`Strong ridge, $\lambda=10$: grey fits are tightly bunched, but the red mean is much flatter than the green sine curve.`),
     ],
+    manim: 'BiasVariance', // animations/probability.py: many datasets, many fits: bias and variance
     rows: [
       {
         eq: R`m(x)=\mathbb E_{\mathcal D}\big[\hat f_{\mathcal D}(x)\big]`,
@@ -311,6 +314,7 @@ const sections: Section[] = [
       text(R`Fix $x$. Fresh target noise $\epsilon$ is independent of the training data.`),
       text(R`$\sigma^2(x)$ is the noise variance at $x$. Keep the training method fixed.`),
     ],
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`Y=f^*(x)+\epsilon,\qquad\mathbb E[\epsilon\mid x]=0,\qquad\mathbb E[\epsilon^2\mid x]=\sigma^2(x)`,
@@ -342,6 +346,7 @@ const sections: Section[] = [
     slides: [slide('II', 46, 'Bias–variance decomposition at one input')],
     slideNote: 'Row 1 is the slide. Row 2 checks it. The short names $a$ and $b$ in row 3 are added to keep the next steps readable.',
     pre: [term('Add and subtract the true mean and the mean fit')],
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`Y-\hat f_{\mathcal D}(x)=\underbrace{f^*(x)-m(x)}_{\text{mean error}}+\underbrace{m(x)-\hat f_{\mathcal D}(x)}_{\text{fit fluctuation}}+\epsilon`,
@@ -372,6 +377,7 @@ const sections: Section[] = [
     why: R`The expected squared error is what we want to understand. Squaring gives six terms, and linearity lets us average each one separately.`,
     slides: [slide('II', 46, 'Bias–variance decomposition at one input')],
     slideNote: 'The slide says "Square and average". The six-term expansion is added to show I60 and I25.',
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`\big(Y-\hat f_{\mathcal D}(x)\big)^2=(a+b+\epsilon)^2=a^2+b^2+\epsilon^2+2ab+2a\epsilon+2b\epsilon`,
@@ -395,6 +401,7 @@ const sections: Section[] = [
     slides: [slide('II', 46, 'Bias–variance decomposition at one input')],
     slideNote: 'The slide states the two zero means (rows 1 and 3). The term-by-term steps are added so each rule is visible.',
     pre: [text(R`Cross-terms vanish: the fluctuations have mean zero, and fresh noise is independent of the fitted predictor.`)],
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`\mathbb E_{\mathcal D}[b]=\mathbb E_{\mathcal D}\big[m(x)-\hat f_{\mathcal D}(x)\big]=\htmlClass{c-orange}{m(x)}-\mathbb E_{\mathcal D}\big[\hat f_{\mathcal D}(x)\big]=m(x)-m(x)=0`,
@@ -433,6 +440,7 @@ const sections: Section[] = [
     slides: [slide('II', 46, 'Bias–variance decomposition at one input')],
     slideNote: 'Rows 1 to 3 name each surviving term; the final display is the slide.',
     display: R`\mathbb E_{\mathcal D,Y}\big[(Y-\hat f_{\mathcal D}(x))^2\mid X=x\big]=\underbrace{\big(m(x)-f^*(x)\big)^2}_{\text{bias}^2}+\underbrace{\mathbb E_{\mathcal D}\big[(\hat f_{\mathcal D}(x)-m(x))^2\big]}_{\text{variance}}+\underbrace{\sigma^2(x)}_{\text{noise}}`,
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`\mathbb E[a^2]=a^2=\big(f^*(x)-m(x)\big)^2=\big(m(x)-f^*(x)\big)^2`,
@@ -475,6 +483,7 @@ const sections: Section[] = [
     slides: [slide('II', 47, 'Bias–variance explains population risk')],
     slideNote: 'Row 3 is the slide. Rows 1 and 2 are added to show how the fixed-input result is averaged over inputs.',
     pre: [text(R`Population risk averages fresh cases for one trained predictor. Now also average over possible training sets $\mathcal D$.`)],
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`\mathbb E_{\mathcal D}\big[R(\hat f_{\mathcal D})\big]=\mathbb E_{\mathcal D}\Big[\mathbb E_{\mathbf X}\big[\mathbb E_Y[(Y-\hat f_{\mathcal D}(\mathbf X))^2\mid\mathbf X]\big]\Big]`,

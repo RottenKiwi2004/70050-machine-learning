@@ -49,6 +49,7 @@ const sections: Section[] = [
     why: R`Give each class its own linear score, then turn the $C$ scores into probabilities with the softmax: exponentiate (so every value is positive) and divide by the total (so they add to 1). The largest score gets the largest probability, a "soft" version of picking the maximum.`,
     slides: [slide('L2', 29, 'Softmax class probabilities')],
     slideNote: R`Figure: left, "Discriminants (inputs)": three planes $\mathbf w_c^\top\mathbf x$ over two inputs; right, "Softmax (outputs)": the class probabilities, each near 1 where its plane is highest. The name $z_c$ (row 2), the vector form (row 3) and the numbers are added; the slide writes $\mathbf w_c^\top\mathbf x$ inside the exponential without naming it.`,
+    manim: 'SoftmaxBars', // animations/classification.py: scores, exponentials, probabilities
     rows: [
       {
         eq: R`p_c(\mathbf x)=\frac{\exp(\mathbf w_c^\top\mathbf x)}{\sum_{k=1}^{C}\exp(\mathbf w_k^\top\mathbf x)},\qquad W=[\mathbf w_1,\dots,\mathbf w_C]`,
@@ -91,6 +92,7 @@ const sections: Section[] = [
     why: R`As in the binary case, the training loss is the negative log-likelihood. A one-hot target vector lets us write the probability of the observed class as one product, and its negative log is the cross-entropy we minimise to fit $W$.`,
     slides: [slide('L2', 30, 'Multiclass cross-entropy'), slide('L2', 150, 'Training objective, multiclass case (appendix)')],
     slideNote: R`Slide 150 (appendix) repeats slide 30 and adds "fit $W$ by minimising this summed cross-entropy objective". Row 4 (the simplified form) and the numbers are added.`,
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`(\mathbf x_i,y_i),\quad y_i=3,\qquad \mathbf t_i=(0,0,1,0)^\top`,

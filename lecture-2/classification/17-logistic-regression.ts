@@ -30,6 +30,7 @@ const sections: Section[] = [
     why: R`In Lecture 1 the squared loss came from a probability model: Gaussian noise around $\mathbf w^\top\mathbf x$. To get a better classification loss we repeat that route, so first recall each step and see which piece must change.`,
     slides: [slide('L2', 18, 'Reminder: likelihood for regression')],
     slideNote: R`The red box on the slide marks the two pieces that change for classification: the target set ($y_i\in\mathbb R$) and the Gaussian factor.`,
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`\mathcal D=\{(\mathbf x_i,y_i)\}_{i=1}^{N},\qquad y_i\in\mathbb R`,
@@ -85,6 +86,8 @@ const sections: Section[] = [
     why: R`The score $\mathbf w^\top\mathbf x$ can be any real number, but a probability must lie between 0 and 1. The sigmoid squashes the score into $(0,1)$, which gives a probability for class 1 and, through the Bernoulli formula, the missing likelihood factor.`,
     slides: [slide('L2', 20, 'The logistic model')],
     slideNote: R`Rows 2 and 3 show the steps behind the log-odds identity. The numeric example is added.`,
+    derive: true, // the rows as an animated derivation, drawn in the page
+    manim: 'SigmoidSquash', // animations/classification.py: the score z squashed into a probability
     rows: [
       {
         eq: R`g(a)=\frac{1}{1+\exp(-a)}`,
@@ -138,6 +141,7 @@ const sections: Section[] = [
     title: 'Likelihood for binary classification',
     why: R`With one Bernoulli factor per example we can now write the likelihood of the whole training set, and take its log to turn the product into a sum that is easy to differentiate.`,
     slides: [slide('L2', 21, 'Likelihood for binary classification')],
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`p(y_1,\dots,y_N\mid\mathbf x_1,\dots,\mathbf x_N;\mathbf w)=\prod_{i=1}^{N}p(y_i\mid\mathbf x_i;\mathbf w)`,
@@ -214,6 +218,7 @@ const sections: Section[] = [
     ],
     slideNote: R`Rows 1 to 4 are the appendix derivation (slide 146) behind slide 23's first line. Slide 24 plots row 6 against the 0–1 loss. The numeric row is added.`,
     pre: [text(R`Use the margin defined earlier, with signed labels $y_\pm\in\{-1,+1\}$.`)],
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`P(Y_\pm=+1\mid\mathbf x;\mathbf w)=\frac{1}{1+\exp[-f_{\mathbf w}(\mathbf x)]}`,
@@ -261,6 +266,7 @@ const sections: Section[] = [
     why: R`Side by side the two surrogates behave the same for errors near the boundary but disagree far from it. This is what makes logistic regression robust to points that are already classified correctly.`,
     slides: [slide('L2', 25, 'Log loss and squared loss'), slide('L2', 26, 'A distant group changes the fit')],
     slideNote: R`Slide 26 figure: two classes (red crosses, blue circles) in two input features. Left: linear regression (purple) and logistic regression (green) give almost the same boundary. Right: a far group of blue points is added at the bottom right; the purple boundary tilts and now cuts through the blue class, while the green one barely moves. The table is added.`,
+    manim: 'MarginLosses', // animations/classification.py: 0-1, squared and log loss along the margin
     rows: [
       {
         eq: R`\ell_{\text{sq}}=(1-m)^2,\qquad \ell_{\log}=\log(1+\exp(-m))`,

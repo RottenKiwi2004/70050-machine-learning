@@ -26,6 +26,7 @@ const sections: Section[] = [
       lab(R`Slide 40 is a figure only: with $D=2$ features the fitted model is a plane, and each residual is the vertical gap from a point to that plane.`),
       warn(R`The column of 1s multiplies $w_0$, so the intercept lives inside $X\mathbf w$.`),
     ],
+    manim: 'MatrixShapes', // animations/regression.py: the shapes of y = Xw + e and of X^T X, as blocks
     rows: [
       {
         eq: R`\mathbf y = X\mathbf w + \boldsymbol\varepsilon`,
@@ -44,6 +45,7 @@ const sections: Section[] = [
     why: R`To choose the best $\mathbf w$ we need one number that says how badly a given $\mathbf w$ fits the data. The sum of squared errors is that number, and writing it as $\lVert\boldsymbol\varepsilon\rVert_2^2$ gives a compact formula in $\mathbf w$ that we can differentiate in one go.`,
     slides: [slide('I', 42, 'Squared error as a vector norm'), slide('I', 43, 'Least squares solution, in vector form')],
     slideNote: 'Row 1 is slide 42. Rows 2 and 4 are slide 43. Row 3, the four-term expansion, is added to show I2 and I3.',
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`L(\mathbf w)=\sum_{i=1}^{N}\varepsilon_i^2=\boldsymbol\varepsilon^\top\boldsymbol\varepsilon=\lVert\boldsymbol\varepsilon\rVert_2^2`,
@@ -83,6 +85,7 @@ const sections: Section[] = [
     why: R`The best $\mathbf w$ sits at the lowest point of the loss, where the slope in every direction (the gradient) is zero. So before we can solve for it we need the gradient, and we find it one term at a time with the identities in the index.`,
     slides: [slide('I', 43, 'Least squares solution, in vector form')],
     slideNote: 'Slide 43 goes straight from the condition to the result. The term-by-term steps here are added so each identity is visible.',
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`\nabla_{\mathbf w}L=\nabla_{\mathbf w}(\mathbf y^\top\mathbf y)-2\,\nabla_{\mathbf w}(\mathbf y^\top X\mathbf w)+\nabla_{\mathbf w}(\mathbf w^\top X^\top X\mathbf w)`,
@@ -121,6 +124,8 @@ const sections: Section[] = [
     title: R`Solve for $\hat{\mathbf w}$`,
     why: R`Setting the gradient to zero gives the Normal Equation, a linear equation in $\hat{\mathbf w}$. Solving it gives the best weights as a closed-form formula, so we get them directly instead of searching step by step.`,
     slides: [slide('I', 39, 'Matrix form of the normal equations'), slide('I', 43, 'Least squares solution, in vector form')],
+    derive: true, // the rows as an animated derivation, drawn in the page
+    manim: 'NormalEquationsAsProjection', // animations/regression.py: Xw-hat is the projection of y onto the columns of X
     rows: [
       {
         eq: R`\nabla_{\mathbf w}L(\hat{\mathbf w})=-2X^\top\mathbf y+2X^\top X\hat{\mathbf w}=\mathbf 0`,

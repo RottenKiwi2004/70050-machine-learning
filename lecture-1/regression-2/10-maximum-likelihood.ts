@@ -83,6 +83,7 @@ const sections: Section[] = [
       text(R`$N$ observations $x_n$, independently drawn from one distribution.`),
       text(R`$\boldsymbol\theta$ is the model's parameter vector. Hold the data fixed and vary $\boldsymbol\theta$.`),
     ],
+    manim: 'GaussianLikelihood', // animations/probability.py: sliding the mean: the likelihood peaks at the sample mean
     rows: [
       {
         eq: R`p(x_1,\dots,x_N;\boldsymbol\theta)=\prod_{n=1}^{N}p(x_n;\boldsymbol\theta)`,
@@ -108,6 +109,7 @@ const sections: Section[] = [
     title: 'Log-likelihood and the cost C',
     why: R`Products of many densities are awkward: they get tiny, and differentiating a product is messy. Taking the log turns the product into a sum, which we can differentiate term by term. Flipping the sign gives a cost $C$ to minimise, like the squared-error loss.`,
     slides: [slide('II', 16, 'Likelihood and the fitting objective')],
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`\log L(\boldsymbol\theta)=\sum_{n=1}^{N}\log p(x_n;\boldsymbol\theta)`,
@@ -143,6 +145,7 @@ const sections: Section[] = [
     ],
     slideNote: R`Slide 17 states the final $C(\mu,\sigma^2)$. Rows 1 to 3 are added to show how it comes from the slide 15 density.`,
     pre: [text(R`Fit a Gaussian to $N$ scalar observations. The parameters are $\boldsymbol\theta=(\mu,\sigma^2)$.`)],
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`p(x_n;\mu,\sigma^2)=\frac{1}{\sqrt{2\pi\sigma^2}}\exp\!\Big[-\frac{(x_n-\mu)^2}{2\sigma^2}\Big]`,
@@ -183,6 +186,7 @@ const sections: Section[] = [
     why: R`The best $\mu$ is where the cost stops decreasing, so its derivative in $\mu$ is zero. Doing this by hand shows that the maximum likelihood mean is simply the average of the data.`,
     slides: [slide('II', 17, 'Gaussian maximum likelihood estimates')],
     slideNote: R`Slide 17 gives the last form of row 4 set to zero (rows 4 and 5) and $\hat\mu$ (row 6). Rows 1 to 3 (term-by-term derivative), the first form in row 4 and the second-derivative check are added.`,
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`\frac{\partial C}{\partial\mu}=\frac{\partial}{\partial\mu}\Big[\htmlClass{c-orange}{\tfrac N2\log(2\pi\sigma^2)}\Big]+\frac{1}{2\sigma^2}\sum_{n=1}^{N}\frac{\partial}{\partial\mu}(x_n-\mu)^2`,
@@ -235,6 +239,7 @@ const sections: Section[] = [
     why: R`The same zero-derivative recipe, now in $\sigma^2$, gives the maximum likelihood variance. The point to remember is that it divides by $N$, which the slide stresses.`,
     slides: [slide('II', 17, 'Gaussian maximum likelihood estimates')],
     slideNote: R`Slide 17 gives only the result $\hat\sigma^2$. The derivative steps (rows 1 to 3) are added. Writing $v$ for $\sigma^2$ is only a shorthand here, not slide notation.`,
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`C=\htmlClass{c-orange}{\tfrac N2\log(2\pi)}+\tfrac N2\log v+\frac{S}{2v},\qquad v=\sigma^2,\ \ S=\sum_{n=1}^{N}(x_n-\hat\mu)^2`,
@@ -349,6 +354,7 @@ const sections: Section[] = [
     why: R`This is the bridge to regression. With a diagonal or equal-variance $\boldsymbol\Sigma$, the Gaussian's exponent becomes a (weighted) sum of squares. So minimising the Gaussian negative log-likelihood is minimising squared error, which is how least squares gets a probabilistic meaning.`,
     slides: [slide('II', 20, 'Diagonal covariance and sums of squares')],
     slideNote: R`The determinant (row 3) and the negative log-likelihood (row 5) are added to explain why the slide says "fixed" variances. The explicit $\boldsymbol\Sigma^{-1}$ (rows 2 and 6) is added; the slide only says "$\boldsymbol\Sigma^{-1}$ is its inverse".`,
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`\boldsymbol\Sigma=\operatorname{diag}(\sigma_1^2,\dots,\sigma_d^2)`,

@@ -115,6 +115,7 @@ const sections: Section[] = [
       text(R`Choose red with probability $0.4$, blue with probability $0.6$.`),
       lab(R`Each inner cell is a joint probability. The green totals are marginals.`),
     ],
+    manim: 'JointAsAreas', // animations/probability.py: the joint table as areas: marginals and conditionals
     rows: [
       {
         eq: R`P(Y=a,B=r)=0.10`,
@@ -170,6 +171,7 @@ const sections: Section[] = [
     slides: [slide('II', 13, 'Bayes’ rule: reverse the conditioning')],
     slideNote: R`Row 3 expands the evidence with the sum and product rules, and row 5 (the blue posterior) is added as a check.`,
     pre: [text('Observed: an apple. Which box did it come from?')],
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`p(B=b\mid Y=a)=\frac{p(Y=a\mid B=b)\,p(B=b)}{p(Y=a)}`,

@@ -50,6 +50,7 @@ const sections: Section[] = [
     why: R`To see when averaging helps we compare two numbers: the average error of the individual learners, and the error of their average. Writing each learner as "truth plus its own error" makes the comparison a calculation.`,
     slides: [slide('L2', 96, 'Error of an average predictor')],
     slideNote: 'The step in row 4 is added.',
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`\bar f(\mathbf x)=\frac1K\sum_{k=1}^{K}f_k(\mathbf x),\qquad f_k(\mathbf x)=f^*(\mathbf x)+\epsilon_k(\mathbf x)`,
@@ -87,6 +88,7 @@ const sections: Section[] = [
     slides: [slide('L2', 97, 'Uncorrelated errors can average out')],
     slideNote: R`Rows 2 and 4 show the expansion and the linearity step that the slide combines. The numbers and the "identical errors" callout are added.`,
     pre: [text('Assume zero-mean errors, uncorrelated across different predictors.')],
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`\mathbb E_{\mathbf x}\big[\epsilon_k(\mathbf x)\,\epsilon_{k'}(\mathbf x)\big]=0\quad\text{for }k\ne k'`,

@@ -114,6 +114,7 @@ const sections: Section[] = [
     slides: [slide('L2', 16, 'Rewriting the quadratic loss'), slide('L2', 17, 'Quadratic loss and classification margins')],
     slideNote: 'Row 2 shows the factoring step that the slide states in words. The numeric examples are added.',
     pre: [text('Use the signed labels and margin defined earlier.')],
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`\ell_{\text{sq}}=(y_\pm-z)^2`,

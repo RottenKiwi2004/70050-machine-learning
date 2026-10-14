@@ -55,6 +55,7 @@ const sections: Section[] = [
       text('Green: current parameters. Red: minimum.'),
       text('The gradient gives the steepest local increase. Take a small step in the opposite direction.'),
     ],
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`L(\mathbf w)=\tfrac12\big(w_1^2+2w_2^2\big)`,
@@ -108,6 +109,7 @@ const sections: Section[] = [
     why: R`The learning rate is the one dial gradient descent has. A one-parameter example shows exactly when it converges, oscillates or diverges, and why "the updates got small" is not a reliable stopping rule on its own.`,
     slides: [slide('L2', 47, 'Learning rate and stopping')],
     slideNote: R`Row 2 (the closed form) and the numbers are added. The widget below is added: it runs the slide 40 bowl with your choice of $\eta$.`,
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`L(w)=\tfrac12w^2,\qquad L'(w)=w,\qquad w_{t+1}=(1-\eta)\,w_t`,

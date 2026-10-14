@@ -158,6 +158,7 @@ const sections: Section[] = [
     why: 'Kernel values on their own do not sum to anything in particular. Dividing each one by their total turns them into weights that sum to one, so the prediction becomes an average of targets rather than an arbitrary sum.',
     slides: [slide('I', 26, 'Kernel regression: a weighted average'), slide('I', 27, 'Kernel regression: a weighted average')],
     slideNote: 'Row 1 is on both slides. Rows 2 to 4, the check that the weights sum to one, are added to show I9 and C2.',
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`\alpha_i(x)=\frac{K_h(x-x_i)}{\sum_{j=1}^{N}K_h(x-x_j)}`,
@@ -200,6 +201,7 @@ const sections: Section[] = [
     slides: [slide('I', 26, 'Kernel regression: a weighted average'), slide('I', 27, 'Kernel regression: a weighted average')],
     slideNote: R`Row 1 is on both slides. Rows 2 and 3 are added. The two slides differ only in $h$; the readings of the weight bars are approximate. Rows 5 and 6 (the limits of $h$) are added, standard consequences of the formula.`,
     pre: [lab(R`Both slides: $N=17$. Grey: observations. Blue: prediction. Red: query.`)],
+    manim: 'KernelSmoothing', // animations/regression.py: kernel weights around a query point, for two bandwidths
     rows: [
       {
         eq: R`\hat y(x)=\sum_{i=1}^{N}\alpha_i(x)\,y_i`,

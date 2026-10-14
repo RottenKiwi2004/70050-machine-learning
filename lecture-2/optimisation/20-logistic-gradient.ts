@@ -42,6 +42,7 @@ const sections: Section[] = [
     why: R`Every optimiser needs the gradient of the loss. Working one coefficient $w_j$ at a time with the chain rule turns the cross-entropy into a remarkably short result: (prediction minus label) times input, summed over examples.`,
     slides: [slide('L2', 37, 'Differentiating cross-entropy')],
     slideNote: R`Row 3 (where $\partial p_i/\partial w_j$ comes from) and row 5 (the expansion before cancelling) are added to show each step.`,
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`L(\mathbf w)=-\sum_{i=1}^{N}\big\{y_i\log p_i+(1-y_i)\log(1-p_i)\big\},\qquad p_i=g(\mathbf w^\top\mathbf x_i)`,
@@ -88,6 +89,7 @@ const sections: Section[] = [
     why: R`Collecting all coordinates gives the gradient as one vector, and as $X^\top(\mathbf p-\mathbf y)$ in matrix form. Setting it to zero gives equations that $\mathbf w$ appears inside nonlinearly, which is exactly why we must fit iteratively.`,
     slides: [slide('L2', 38, 'The logistic gradient has a simple form')],
     slideNote: R`Row 4 (matrix form) is added, taken from appendix slide 149. The comparison with least squares in the callout is added.`,
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`p_i=g(\mathbf w^\top\mathbf x_i),\qquad z_i=\mathbf w^\top\mathbf x_i,\qquad \ell_i=-y_i\log p_i-(1-y_i)\log(1-p_i)`,

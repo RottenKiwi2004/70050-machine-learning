@@ -235,6 +235,7 @@ const sections: Section[] = [
       lab(R`Each wedge is bounded by the two lines from the corner at right angles to the two edges that meet there (at $45^\circ$).`),
       text('Many observations project onto a corner, where one coordinate is zero.'),
     ],
+    manim: 'L1VsL2Geometry', // animations/regularisation.py: loss contours meeting the L2 disc and the L1 diamond
     rows: [
       {
         eq: R`\text{corners: }(\pm\mu,0),\ (0,\pm\mu)`,

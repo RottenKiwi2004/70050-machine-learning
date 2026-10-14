@@ -181,6 +181,7 @@ const sections: Section[] = [
     title: 'Least squares criterion',
     why: R`To choose the best line we need one number that says how bad a given $\mathbf w$ is. Squaring the residuals makes every error count positively and punishes big misses most; adding them gives a loss whose minimiser is the least-squares fit.`,
     slides: [slide('I', 35, 'Least squares criterion')],
+    manim: 'SquaredResiduals', // animations/least_squares.py: the residuals as squares, and the line with the least area
     rows: [
       {
         eq: R`L(\mathbf w)=\sum_{i=1}^{N}\epsilon_i^2=\sum_{i=1}^{N}(y_i-w_0-w_1x_i)^2`,
@@ -235,6 +236,7 @@ const sections: Section[] = [
     why: R`$L$ depends on $w_0$ and $w_1$ only through the residuals. Differentiating each residual first (trivial: it is linear) and then using the chain rule gives both partial derivatives of $L$ without expanding any squares.`,
     slides: [slide('I', 37, 'Differentiating through the residual')],
     slideNote: R`Row 3 (derivative of a sum) is added. Rows 6 and 7 are added: the slide works only $w_0$, and the $w_1$ result appears on slide 38.`,
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`L(\mathbf w)=\sum_{i=1}^{N}\epsilon_i^2,\qquad \epsilon_i=y_i-w_0-w_1x_i`,
@@ -300,6 +302,7 @@ const sections: Section[] = [
     why: R`The conditions are tangled sums. Splitting them and pulling the unknowns out front shows they are just two linear equations in $w_0$ and $w_1$, whose coefficients are sums we can compute from the data.`,
     slides: [slide('I', 38, 'Fitting a line: stationary conditions')],
     slideNote: 'Rows 1 and 3 are added to show the steps; rows 2 and 4 are the slide.',
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`\text{(a)}\div(-2):\quad\sum_i y_i-\sum_i w_0-\sum_i w_1x_i=0\ \Rightarrow\ \sum_i y_i-Nw_0-w_1\sum_i x_i=0`,
@@ -354,6 +357,7 @@ const sections: Section[] = [
     why: R`Building $X$ with a column of 1s and a column of inputs turns the $2\times2$ system into $X^\top X\mathbf w=X^\top\mathbf y$. That form does not care how many columns $X$ has, so the same formula works for any number of inputs.`,
     slides: [slide('I', 39, 'Matrix form of the normal equations')],
     slideNote: R`Rows 2 and 3 are added: they multiply out $X^\top X$ and $X^\top\mathbf y$ to show they are the matrix and right-hand side of slide 38. The slide writes row 4 as $X^\top\mathbf y=X^\top X\mathbf w$. The slide attaches the label "Normal Equation" to the boxed $\hat{\mathbf w}$ (row 5).`,
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`\mathbf y=\begin{bmatrix}y_1\\ \vdots\\ y_N\end{bmatrix},\qquad X=\begin{bmatrix}\htmlClass{c-red}{1} & x_1\\ \vdots & \vdots\\ \htmlClass{c-red}{1} & x_N\end{bmatrix}`,

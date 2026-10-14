@@ -75,6 +75,7 @@ const sections: Section[] = [
     why: R`A tree is a probability model too: each leaf region gets its own simple distribution. That gives a likelihood, and adding a cost for the tree's size gives an objective that balances fit against complexity, as regularisation did.`,
     slides: [slide('L2', 83, 'Decision-tree leaf models and objective')],
     slideNote: R`Figure: the $(x_1,x_2)$ plane cut into five boxes A to E by thresholds $\theta_1,\dots,\theta_4$, and the tree that makes them (root $x_1>\theta_1$). The region inequalities (row 1) are read from the figure; the leaf estimates (row 4) are added.`,
+    manim: 'TreePartition', // animations/trees.py: each test cuts the input space; the leaves are boxes
     rows: [
       {
         eq: R`\begin{array}{ll}A:\ x_1\le\theta_1,\ x_2<\theta_2 & B:\ x_1\le\theta_1,\ x_2\ge\theta_2\\ C:\ x_1>\theta_1,\ x_2\le\theta_3,\ x_1<\theta_4 & D:\ x_1>\theta_1,\ x_2\le\theta_3,\ x_1\ge\theta_4\\ E:\ x_1>\theta_1,\ x_2>\theta_3\end{array}`,
@@ -183,6 +184,7 @@ const sections: Section[] = [
       text(R`For class labels $Y$: $p_c=P(Y=c)$. There are $C$ classes. Uniform: $H=\log C$.`),
       text(R`The largest entropy arises from a uniform distribution: $H=-\ln(1/30)=3.40$ for 30 bins.`),
     ],
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`H(Y)=-\sum_{c=1}^{C}p_c\log p_c`,
@@ -212,6 +214,7 @@ const sections: Section[] = [
       text(R`Choose a feature test $h$ from the feature pool and a threshold $\theta$.`),
       text(R`$I_n$ indexes examples at the parent node; $I_{\mathrm L}$ and $I_{\mathrm R}$ are its children.`),
     ],
+    manim: 'InformationGain', // animations/trees.py: entropy before and after a split
     rows: [
       {
         eq: R`P_n(c)=\frac{1}{|I_n|}\sum_{i\in I_n}\mathbb I[y_i=c]`,

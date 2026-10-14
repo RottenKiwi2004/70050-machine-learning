@@ -125,6 +125,7 @@ const sections: Section[] = [
     why: R`Writing the SGD update one coordinate at a time shows what the L2 penalty does: before each data step it multiplies every non-intercept coefficient by a number slightly below 1. This is the "weight decay" view of ridge.`,
     slides: [slide('L2', 65, 'SGD and coefficient shrinkage')],
     slideNote: R`Rows 2 and 3 show the steps from $\mathbf g_t$ to the slide's last line. The intercept row is added.`,
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`\mathbf g_t=\underbrace{\frac1B\sum_{i\in\mathcal B_t}\nabla\ell_i(\mathbf w_t)}_{\text{mean data gradient}}+\underbrace{\lambda\mathbf r(\mathbf w_t)}_{\text{penalty gradient}}`,

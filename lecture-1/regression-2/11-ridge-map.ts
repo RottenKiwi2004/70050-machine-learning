@@ -69,6 +69,7 @@ const sections: Section[] = [
       lab(R`Figure: axes $w_1,w_2$ (two coefficients). A red ellipse is a contour of the likelihood around the ML estimate. A green circle is a contour of the prior around the prior mean. The MAP estimate (blue dot) lies between them: pulled away from the ML estimate towards the prior mean.`),
       text(R`ML: maximum likelihood. MAP: maximum a posteriori. A prior gives a probabilistic basis for a penalty.`),
     ],
+    manim: 'PriorTimesLikelihood', // animations/probability.py: prior x likelihood: the MAP estimate sits between them
     rows: [
       {
         eq: R`\text{likelihood: }p(\mathbf y\mid X,\mathbf w)`,
@@ -106,6 +107,7 @@ const sections: Section[] = [
     why: R`To use probability we need a story for how the data were made: a linear function plus random noise. With that story, each choice of $\mathbf w$ gives each observed $y_i$ a probability density, and a good $\mathbf w$ is one that makes the observed data likely.`,
     slides: [slide('II', 22, 'A probabilistic model for regression')],
     slideNote: R`Row 3 (the distribution of $y_i$) is added to connect rows 2 and 4. The figure shows four data points (red) and a fitted line through the origin.`,
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`y_i=\mathbf x_i^\top\mathbf w+\epsilon_i,\qquad i=1,\dots,N`,
@@ -149,6 +151,7 @@ const sections: Section[] = [
     why: R`Maximising the likelihood is the probabilistic way to fit $\mathbf w$. Working it through shows that, with Gaussian noise, it gives exactly the least-squares fit we already know. This is the first half of the ridge story; the prior supplies the second half.`,
     slides: [slide('II', 23, 'Gaussian likelihood gives least squares')],
     slideNote: R`The slide shows only row 5 and row 7. Rows 1 to 4 (product over $i$, log of the product, the per-example term) and row 6 are added so each rule is visible.`,
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`p(\mathbf y\mid X,\mathbf w,\sigma^2)=\prod_{i=1}^{N}p(y_i\mid\mathbf x_i,\mathbf w)`,
@@ -221,6 +224,7 @@ const sections: Section[] = [
       text('Centred data. Fit the intercept separately without a penalty.'),
       warn(R`The intercept is not inside $\mathbf w$, so the prior (and hence the penalty) does not shrink it.`),
     ],
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`\mathbf w\sim\mathcal N(\mathbf 0,\tau^2 I)`,
@@ -289,6 +293,7 @@ const sections: Section[] = [
     why: R`Now combine the two halves. Choosing the most probable $\mathbf w$ after seeing the data (MAP) and taking negative logs gives the data-fit term from the likelihood plus the penalty from the prior. That is exactly the ridge objective, with $\lambda=\sigma^2/\tau^2$.`,
     slides: [slide('II', 26, 'MAP estimation gives the ridge objective')],
     slideNote: R`The slide shows rows 1, 6, 7 and the value of $\lambda_{\text{MSE}}$. Rows 2 to 5 unpack "Bayes' rule, then take negative logs"; the objective in row 8 is added to show where $\lambda_{\text{MSE}}$ comes from.`,
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`\hat{\mathbf w}_{\text{MAP}}=\arg\max_{\mathbf w}p(\mathbf w\mid X,\mathbf y)`,
@@ -387,6 +392,7 @@ const sections: Section[] = [
     ],
     nonExaminable: true,
     slideNote: R`Rows 1 to 3, 5 and 6 are II 28. Row 4 is added to show that $S$ is a scaled version of the inverse in the ridge formula. I 56 is cited for the ridge estimate that $\mathbf m$ equals.`,
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`p(\mathbf w\mid X,\mathbf y)=\mathcal N(\mathbf m,S)`,

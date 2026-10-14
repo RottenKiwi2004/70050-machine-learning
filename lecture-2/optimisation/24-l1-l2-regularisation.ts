@@ -9,6 +9,7 @@ const sections: Section[] = [
     why: R`The L2 penalty pulls each coefficient towards zero in proportion to its size. That pull fades as the coefficient gets small, so L2 makes coefficients small but almost never exactly zero. If we want a model that ignores some features altogether, we need a different penalty.`,
     slides: [slide('L2', 69, 'L1 and L2 regularisation (section divider)'), slide('L2', 70, 'L2 shrinkage weakens near zero')],
     slideNote: R`Slide 69 is the divider (figure: the L1 diamond and the L2 circle; reading Murphy §§11.4.1–11.4.2, L1 regularisation and sparsity). Row 3 and the numbers are added.`,
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`\Omega_2(\mathbf w)=\frac\lambda2\sum_{j=1}^{D}w_j^2,\qquad\frac{\partial\Omega_2}{\partial w_j}=\lambda w_j`,
@@ -79,6 +80,7 @@ const sections: Section[] = [
     why: R`The derivative explains the difference. The L1 pull has the same size however small the coefficient is, so it can finish the job and reach zero; the corner of $|w|$ at zero is where the optimum then sits.`,
     slides: [slide('L2', 73, 'L1 shrinkage and feature selection')],
     slideNote: R`Rows 2 and 3 (penalty-only steps) and the numbers are added for comparison with the L2 section.`,
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`\frac{\mathrm d}{\mathrm dw_j}\big[\lambda|w_j|\big]=\lambda\,\operatorname{sign}(w_j),\qquad w_j\ne0`,
@@ -169,6 +171,7 @@ const sections: Section[] = [
       text(R`L2: the $\ell_2$-norm is isotropic (the same in every direction). The nearest point usually has several nonzero coordinates.`),
       text('L1: many coefficient vectors project onto a corner, where one coordinate is zero.'),
     ],
+    manim: 'L1VsL2Geometry', // animations/regularisation.py: loss contours meeting the L2 disc and the L1 diamond
     rows: [
       {
         eq: R`\Pi_{\lVert\cdot\rVert_2\le r}(\mathbf v)=r\,\frac{\mathbf v}{\lVert\mathbf v\rVert_2}\quad(\lVert\mathbf v\rVert_2>r)`,

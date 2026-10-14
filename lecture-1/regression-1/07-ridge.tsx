@@ -117,6 +117,7 @@ const sections: Section[] = [
     slides: [slide('I', 55, 'Ridge regression')],
     slideNote: 'Rows 2 and 3 are added: they expand the norms exactly as in the matrix least-squares topic.',
     display: ridgeObjective,
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`L_{\text{ridge}}(\mathbf w)=\lVert\mathbf y-X\mathbf w\rVert_2^2+\lambda\lVert\mathbf w\rVert_2^2`,
@@ -148,6 +149,7 @@ const sections: Section[] = [
     why: R`Penalising $w_0$ would pull the whole fit towards $y=0$, so the answer would change if every target were shifted by a constant. Centring the data and leaving the intercept out of the penalty keeps the shrinkage on the slopes only.`,
     slides: [slide('I', 55, 'Ridge regression'), slide('I', 57, 'Stronger regularisation restricts good fits')],
     slideNote: R`The slide gives the three instructions in rows 1, 2 (label) and 4. Rows 2 and 3 are added to show why they fit together: with centred data the best unpenalised intercept is 0, so $X$ can drop its column of 1s.`,
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`\tilde{\mathbf x}_i=\mathbf x_i-\bar{\mathbf x},\quad \tilde y_i=y_i-\bar y,\qquad \bar{\mathbf x}=\frac1N\sum_{i=1}^{N}\mathbf x_i,\quad \bar y=\frac1N\sum_{i=1}^{N}y_i`,
@@ -188,6 +190,7 @@ const sections: Section[] = [
     why: R`As in least squares, the best $\mathbf w$ is where the gradient is zero. The fit term gives the gradient we already know; the penalty adds just $2\lambda\mathbf w$.`,
     slides: [slide('I', 56, 'Ridge: the parameter estimate'), slide('II', 3, 'Ridge regression')],
     slideNote: 'Deck II slide 3 repeats deck I slide 56. Rows 1 to 4 are added to show each identity; row 5 is the slide.',
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`\nabla_{\mathbf w}L_{\text{ridge}}=\nabla_{\mathbf w}(\htmlClass{c-orange}{\mathbf y^\top\mathbf y})-2\,\nabla_{\mathbf w}(\mathbf y^\top X\mathbf w)+\nabla_{\mathbf w}(\mathbf w^\top X^\top X\mathbf w)+\lambda\,\nabla_{\mathbf w}(\mathbf w^\top\mathbf w)`,
@@ -230,6 +233,7 @@ const sections: Section[] = [
     why: R`Setting the gradient to zero gives a linear equation in $\hat{\mathbf w}$, like the Normal Equation but with $\lambda I$ added. That extra term is what guarantees one unique answer, even when least squares alone has many.`,
     slides: [slide('I', 56, 'Ridge: the parameter estimate'), slide('II', 3, 'Ridge regression')],
     slideNote: 'Rows 2 to 4 are added to show the rearranging; rows 5 and 6 are the slide.',
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`-2X^\top(\mathbf y-X\hat{\mathbf w})+2\lambda\hat{\mathbf w}=\mathbf 0`,

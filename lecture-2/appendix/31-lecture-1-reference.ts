@@ -167,6 +167,7 @@ const sections: Section[] = [
     nonExaminable: true,
     slideNote: 'Labelled non-examinable on the slides. The full derivation, with every identity, is in the Lecture 1 generalisation topic.',
     pre: [text(R`Fix $x$. Fresh target noise $\epsilon$ is independent of the training data. $\sigma^2(x)$ is the noise variance at $x$. Keep the training method fixed.`)],
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`Y=f^*(x)+\epsilon,\qquad\mathbb E[\epsilon\mid x]=0,\qquad\mathbb E[\epsilon^2\mid x]=\sigma^2(x)`,

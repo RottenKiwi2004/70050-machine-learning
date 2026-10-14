@@ -38,6 +38,7 @@ const sections: Section[] = [
     why: R`After fitting probabilities we must choose how they become decisions. The simplest rule compares the class-1 probability with a threshold $\tau$; $\tau=\tfrac12$ is only right when both kinds of mistake cost the same.`,
     slides: [slide('L2', 121, 'Classification thresholds')],
     slideNote: R`Figure: the class-1 probability against the model score (a sigmoid), with the threshold $\tau=0.5$ crossing at score 0. Rows 2 and 3 (the same rule on the score) are added.`,
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`\hat y=\begin{cases}1 & p_{\mathbf w}(\mathbf x)\ge\tau\\ 0 & p_{\mathbf w}(\mathbf x)<\tau\end{cases}`,
@@ -87,6 +88,7 @@ const sections: Section[] = [
     why: R`A table of costs, one entry per (truth, action) pair, plus the class probabilities is all we need: average each action's cost over the possible truths and pick the cheapest. Equal costs give back the threshold $\tfrac12$.`,
     slides: [slide('L2', 124, 'A loss matrix for decisions')],
     slideNote: 'Rows 4 and 5 (the general binary threshold) are added.',
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`\Lambda_{kj}=\text{loss for decision }j\text{ when the true class is }k`,
@@ -124,6 +126,7 @@ const sections: Section[] = [
     slides: [slide('L2', 125, 'Decision costs: the diagnosis example')],
     slideNote: R`The $\Lambda$ entries (row 2) and the intermediate steps are added.`,
     pre: [text('An illustrative loss matrix from the course example.')],
+    derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`\begin{array}{c|cc}\text{Truth / decision} & \text{Cancer (1)} & \text{Normal (0)}\\ \hline\text{Cancer (1)} & 0 & 1000\\ \text{Normal (0)} & 1 & 0\end{array}`,

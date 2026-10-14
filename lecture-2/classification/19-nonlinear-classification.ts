@@ -46,6 +46,8 @@ const sections: Section[] = [
     why: R`The same idea in two dimensions: one class inside a circle and the other outside. A third coordinate equal to the squared distance from the origin lifts the outer points higher, so a flat plane separates them; seen from the original plane, that cut is a circle.`,
     slides: [slide('L2', 34, 'A feature map changes the geometry')],
     slideNote: R`Figure: left, red points inside a dotted circle and blue points outside; right, the same points in 3D after the map, with a plane between the low red points and the high blue points. Rows 2 and 3 are added.`,
+    derive: true, // the rows as an animated derivation, drawn in the page
+    manim: 'FeatureLift', // animations/classification.py: lifting the data by x1^2 + x2^2 makes it separable
     rows: [
       {
         eq: R`\boldsymbol\phi:\ (x_1,x_2)\ \longmapsto\ (x_1,\ x_2,\ x_1^2+x_2^2)`,
