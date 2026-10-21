@@ -50,11 +50,22 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`p_{\mathbf w}(\mathbf x)\ge\tau\iff\mathbf w^\top\mathbf x\ge\log\frac{\tau}{1-\tau}`,
-        notes: [tag(['I64'], 'the sigmoid is increasing and its inverse is the log-odds')],
+        eq: R`p_{\mathbf w}(\mathbf x)=\sigma(z)=\frac1{1+e^{-z}},\qquad z=\mathbf w^\top\mathbf x`,
+        notes: [lab(R`$z$ is the score; shape $1\times1$`), shape(R`\mathbf w,\mathbf x:\ (D+1)\times1;\qquad z:\ 1\times1`)],
       },
       {
-        eq: R`\tau=\tfrac12:\ \mathbf w^\top\mathbf x\ge0,\qquad\tau=0.8:\ \mathbf w^\top\mathbf x\ge\log4=1.39`,
+        eq: R`\frac1{1+e^{-z}}\ge\tau\iff1+e^{-z}\le\frac1\tau\iff e^{-z}\le\frac1\tau-1=\frac{1-\tau}{\tau}`,
+        notes: [lab(R`both sides are positive, so taking reciprocals flips the inequality; then subtract 1 and write $\frac1\tau-1=\frac{1-\tau}\tau$`)],
+      },
+      {
+        eq: R`e^{-z}\le\frac{1-\tau}{\tau}\iff-z\le\log\frac{1-\tau}{\tau}\iff z\ge\log\frac{\tau}{1-\tau}`,
+        notes: [
+          tag(['I64'], 'the log is increasing, so it keeps the direction of the inequality; the sigmoid inverse is the log-odds'),
+          lab(R`multiplying by $-1$ flips the inequality, and $-\log a=\log\frac1a$ turns $\frac{1-\tau}\tau$ into $\frac\tau{1-\tau}$`),
+        ],
+      },
+      {
+        eq: R`\tau=\tfrac12:\ \mathbf w^\top\mathbf x\ge\log\frac{0.5}{0.5}=\log1=0,\qquad\tau=0.8:\ \mathbf w^\top\mathbf x\ge\log\frac{0.8}{1-0.8}=\log\frac{0.8}{0.2}=\log4\approx1.39`,
         notes: [ex(R`$\tau=\tfrac12$ is the score-sign rule $\mathbb 1[z\ge0]$ from the scores topic; a higher $\tau$ demands a larger score`)],
       },
     ],
@@ -87,7 +98,7 @@ const sections: Section[] = [
     title: 'A loss matrix for decisions',
     why: R`A table of costs, one entry per (truth, action) pair, plus the class probabilities is all we need: average each action's cost over the possible truths and pick the cheapest. Equal costs give back the threshold $\tfrac12$.`,
     slides: [slide('L2', 124, 'A loss matrix for decisions')],
-    slideNote: 'Rows 4 and 5 (the general binary threshold) are added.',
+    slideNote: 'Rows 4 to 6 (the general binary threshold, derived step by step) are added.',
     derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
@@ -106,8 +117,19 @@ const sections: Section[] = [
         ],
       },
       {
+        eq: R`R(0\mid\mathbf x)=\Lambda_{00}\,p_0+\Lambda_{10}\,p_1,\qquad R(1\mid\mathbf x)=\Lambda_{01}\,p_0+\Lambda_{11}\,p_1`,
+        notes: [lab(R`write out the sum over $k=0,1$ for each action $j$; the first index of $\Lambda$ is the true class, which picks the probability it multiplies`)],
+      },
+      {
         eq: R`R(1\mid\mathbf x)\le R(0\mid\mathbf x)\iff\Lambda_{01}(1-p)+\Lambda_{11}p\le\Lambda_{00}(1-p)+\Lambda_{10}p`,
         notes: [lab(R`$p=p_1(\mathbf x)$, $p_0(\mathbf x)=1-p$`)],
+      },
+      {
+        eq: R`\Lambda_{00}=\Lambda_{11}=0:\quad\Lambda_{01}(1-p)\le\Lambda_{10}\,p\iff\Lambda_{01}\le\Lambda_{01}p+\Lambda_{10}p=(\Lambda_{01}+\Lambda_{10})\,p`,
+        notes: [
+          lab(R`delete the two zero terms, then add $\Lambda_{01}p$ to both sides and factor out $p$`),
+          lab(R`the costs are positive, so $\Lambda_{01}+\Lambda_{10}>0$ and dividing by it keeps the direction of the inequality`),
+        ],
       },
       {
         eq: R`\Lambda_{00}=\Lambda_{11}=0:\quad\text{choose 1}\iff p\ge\frac{\Lambda_{01}}{\Lambda_{01}+\Lambda_{10}}`,
@@ -124,7 +146,7 @@ const sections: Section[] = [
     title: 'Decision costs: the diagnosis example',
     why: R`When missing a cancer is a thousand times worse than a false alarm, the right threshold is not $\tfrac12$ but about $0.001$: flag the patient even if cancer is very unlikely.`,
     slides: [slide('L2', 125, 'Decision costs: the diagnosis example')],
-    slideNote: R`The $\Lambda$ entries (row 2) and the intermediate steps are added.`,
+    slideNote: R`The $\Lambda$ entries (row 2) and the intermediate steps (including the algebra of the threshold) are added.`,
     pre: [text('An illustrative loss matrix from the course example.')],
     derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
@@ -145,10 +167,10 @@ const sections: Section[] = [
         notes: [tag(['I83'], 'expected loss of each action')],
       },
       {
-        eq: R`\text{choose class 1 when }1-p\le1000p\iff p\ge\frac{1}{1001}\approx0.001`,
+        eq: R`\text{choose class 1 when }1-p\le1000p\iff1\le1000p+p=1001\,p\iff p\ge\frac{1}{1001}\approx0.001`,
         notes: [
-          tag(['I84'], R`$\Lambda_{01}/(\Lambda_{01}+\Lambda_{10})=1/1001$`),
-          ex(R`$p=0.01$: $R(1)=0.99$, $R(0)=10$, so decide cancer even at a 1% probability`),
+          tag(['I84'], R`$\Lambda_{01}/(\Lambda_{01}+\Lambda_{10})=1/(1+1000)=1/1001$`),
+          ex(R`$p=0.01$: $R(1)=1-0.01=0.99$ and $R(0)=1000\times0.01=10$, so $0.99<10$ and we decide cancer even at a 1% probability`),
         ],
       },
     ],

@@ -73,13 +73,34 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`\mathbf z=(2,1,0)^\top:\quad e^{\mathbf z}=(7.39,\,2.72,\,1),\quad\textstyle\sum=11.11,\quad \mathbf p=(0.665,\,0.245,\,0.090)^\top`,
-        notes: [ex('the probabilities add to 1, and their order matches the scores')],
+        eq: R`\mathbf z=(2,1,0)^\top:\quad e^{\mathbf z}=(e^2,e^1,e^0)=(7.39,\,2.72,\,1),\quad\textstyle\sum=7.39+2.72+1=11.11`,
+        notes: [ex('exponentiate each score: all three numbers are positive'), shape(R`\mathbf z,\ e^{\mathbf z}:\ 3\times1`)],
       },
       {
-        eq: R`C=2:\quad p_1(\mathbf x)=\frac{1}{1+\exp\!\big(-(\mathbf w_1-\mathbf w_2)^\top\mathbf x\big)}`,
+        eq: R`\mathbf p=\Big(\frac{7.39}{11.11},\,\frac{2.72}{11.11},\,\frac{1}{11.11}\Big)^\top=(0.665,\,0.245,\,0.090)^\top`,
+        notes: [
+          ex('divide each exponential by the total'),
+          lab(R`check: $0.665+0.245+0.090=1.000$, and the order of the probabilities matches the order of the scores`),
+        ],
+      },
+      {
+        eq: R`\sum_{c=1}^{C}p_c=\sum_{c=1}^{C}\frac{e^{z_c}}{\sum_{k=1}^{C}e^{z_k}}=\frac{1}{\sum_{k=1}^{C}e^{z_k}}\sum_{c=1}^{C}e^{z_c}=\frac{\sum_{c}e^{z_c}}{\sum_{k}e^{z_k}}=1`,
+        notes: [
+          tag(['I67'], R`the denominator does not depend on $c$, so it is a constant factor for the sum over $c$; top and bottom are the same sum with the index renamed`),
+        ],
+      },
+      {
+        eq: R`\frac{e^{z_c+a}}{\sum_{k}e^{z_k+a}}=\frac{e^{a}\,e^{z_c}}{e^{a}\sum_{k}e^{z_k}}=\frac{e^{z_c}}{\sum_{k}e^{z_k}}=p_c`,
+        notes: [
+          tag(['I67'], R`adding the same $a$ to every score changes nothing: $e^{z+a}=e^{a}e^{z}$ and the common factor $e^{a}$ cancels`),
+          warn(R`so only differences between scores matter, which is why the binary case depends on $z_1-z_2$`),
+        ],
+      },
+      {
+        eq: R`C=2:\quad p_1(\mathbf x)=\frac{e^{z_1}}{e^{z_1}+e^{z_2}}=\frac{e^{z_1}/e^{z_1}}{(e^{z_1}+e^{z_2})/e^{z_1}}=\frac{1}{1+e^{z_2-z_1}}=\frac{1}{1+\exp\!\big(-(\mathbf w_1-\mathbf w_2)^\top\mathbf x\big)}`,
         notes: [
           tag(['I67'], 'two-class softmax is the logistic model with w = w1 − w2'),
+          ex(R`divide top and bottom by $e^{z_1}$; then $e^{z_2}/e^{z_1}=e^{z_2-z_1}$ and $z_1-z_2=\mathbf w_1^\top\mathbf x-\mathbf w_2^\top\mathbf x=(\mathbf w_1-\mathbf w_2)^\top\mathbf x$`),
           lab('so binary logistic regression is a special case'),
         ],
       },
@@ -103,7 +124,7 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`P(Y=y_i\mid\mathbf x_i;W)=\prod_{c=1}^{C}p_c(\mathbf x_i)^{t_{ic}}`,
+        eq: R`P(Y=y_i\mid\mathbf x_i;W)=\prod_{c=1}^{C}p_c(\mathbf x_i)^{t_{ic}}=p_1^{0}\,p_2^{0}\,p_3^{1}\,p_4^{0}=1\cdot1\cdot p_3\cdot1=p_3(\mathbf x_i)`,
         notes: [
           lab('likelihood of one training sample'),
           tag(['I68'], R`only the factor for the true class survives: $=p_{y_i}(\mathbf x_i)$`),
@@ -119,11 +140,11 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`=-\sum_{i=1}^{N}\log p_{y_i}(\mathbf x_i)`,
-        notes: [tag(['I68'], 'for each example only the true-class term remains')],
+        eq: R`=-\sum_{i=1}^{N}\big[0\cdot\log p_1+0\cdot\log p_2+1\cdot\log p_3+0\cdot\log p_4\big]=-\sum_{i=1}^{N}\log p_{y_i}(\mathbf x_i)`,
+        notes: [tag(['I68'], 'for each example only the true-class term remains'), lab(R`written for the $C=4$, $y_i=3$ example; in general the single surviving term is $t_{iy_i}\log p_{y_i}=\log p_{y_i}$`)],
       },
       {
-        eq: R`\mathbf p(\mathbf x_i)=(0.1,\,0.2,\,0.6,\,0.1)^\top,\ y_i=3:\quad \ell_i=-\log0.6=0.511`,
+        eq: R`\mathbf p(\mathbf x_i)=(0.1,\,0.2,\,0.6,\,0.1)^\top,\ y_i=3:\quad \ell_i=-\sum_ct_{ic}\log p_c=-\log0.6=0.511`,
         notes: [
           ex('only the probability of the true class enters the loss'),
           lab(R`with $C=2$ this is exactly the binary log-loss`),

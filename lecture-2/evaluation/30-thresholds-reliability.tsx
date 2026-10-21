@@ -24,7 +24,7 @@ const sections: Section[] = [
     title: 'ROC curves and operating points',
     why: R`A probabilistic classifier is really a family of classifiers, one per threshold. Plotting the true-positive rate against the false-positive rate for every threshold shows the whole family at once; the costs of each kind of error then pick the point to use.`,
     slides: [slide('L2', 136, 'Thresholds and reliability (section divider)'), slide('L2', 137, 'ROC curves and operating points')],
-    slideNote: R`Slide 136 is the divider (figure: the ROC curve of slide 137; reading Murphy §§5.1.3–5.1.4, ROC and precision–recall curves). Slide 137 figure: "Thyroid anomaly detection", a stepped red ROC curve, a cyan "Equal" line, and three marked operating points: top right "best when FN costs 10× FP", middle (about FPR 0.3, TPR 0.7) "best when the costs are equal", bottom left "best when FP costs 10× FN". Row 3 and the widget are added.`,
+    slideNote: R`Slide 136 is the divider (figure: the ROC curve of slide 137; reading Murphy §§5.1.3–5.1.4, ROC and precision–recall curves). Slide 137 figure: "Thyroid anomaly detection", a stepped red ROC curve, a cyan "Equal" line, and three marked operating points: top right "best when FN costs 10× FP", middle (about FPR 0.3, TPR 0.7) "best when the costs are equal", bottom left "best when FP costs 10× FN". Row 3 (with its arithmetic) and the widget are added.`,
     rows: [
       {
         eq: R`TPR=\frac{TP}{TP+FN},\qquad FPR=\frac{FP}{FP+TN}`,
@@ -43,7 +43,7 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`\text{confusion matrix }(TP,FN,FP,TN)=(3,1,2,2):\quad TPR=\tfrac34,\ \ FPR=\tfrac24=\tfrac12`,
+        eq: R`\text{confusion matrix }(TP,FN,FP,TN)=(3,1,2,2):\quad TPR=\frac{TP}{TP+FN}=\frac{3}{3+1}=\frac34,\ \ FPR=\frac{FP}{FP+TN}=\frac{2}{2+2}=\frac24=\frac12`,
         notes: [ex('the metrics-topic classifier is one point (0.5, 0.75) on its ROC curve')],
       },
     ],
@@ -55,7 +55,7 @@ const sections: Section[] = [
     title: 'Area under the ROC curve',
     why: R`To compare classifiers without picking a threshold, summarise the whole ROC curve by its area. The area has a neat meaning: the chance that a random positive gets a higher score than a random negative.`,
     slides: [slide('L2', 138, 'Area under the ROC curve')],
-    slideNote: R`Figure: three ROC curves: the diagonal (AUC 0.50), a gently bowed curve (0.65) and a curve that shoots up almost vertically (0.93). The worked example is added.`,
+    slideNote: R`Figure: three ROC curves: the diagonal (AUC 0.50), a gently bowed curve (0.65) and a curve that shoots up almost vertically (0.93). The counting form and the worked example are added.`,
     rows: [
       {
         eq: R`\text{AUC}=P(s_+>s_-)+\tfrac12P(s_+=s_-)`,
@@ -70,8 +70,12 @@ const sections: Section[] = [
         notes: [lab('the diagonal ROC (left panel) is a classifier that ignores the input')],
       },
       {
-        eq: R`s_+\in\{0.9,\,0.6\},\ s_-\in\{0.7,\,0.2\}:\quad\text{pairs }(0.9,0.7)\checkmark,\ (0.9,0.2)\checkmark,\ (0.6,0.7)\ \text{wrong},\ (0.6,0.2)\checkmark\ \Rightarrow\ \text{AUC}=\tfrac34`,
-        notes: [ex('count the positive–negative pairs ranked correctly')],
+        eq: R`\text{AUC}=\frac{\#\{\text{pairs with }s_+>s_-\}+\tfrac12\#\{\text{ties}\}}{\#\text{positives}\times\#\text{negatives}}`,
+        notes: [lab('the probability in the definition, computed by counting over all positive–negative pairs (each pair equally likely)')],
+      },
+      {
+        eq: R`s_+\in\{0.9,\,0.6\},\ s_-\in\{0.7,\,0.2\}:\quad\text{pairs }(0.9,0.7)\checkmark,\ (0.9,0.2)\checkmark,\ (0.6,0.7)\ \text{wrong},\ (0.6,0.2)\checkmark\ \Rightarrow\ \text{AUC}=\frac{3+\tfrac12\cdot0}{2\times2}=\tfrac34`,
+        notes: [ex('count the positive–negative pairs ranked correctly: 3 of the 2 × 2 = 4 pairs, and no ties')],
       },
     ],
   },
@@ -101,12 +105,27 @@ const sections: Section[] = [
     title: 'Confidence intervals',
     why: R`A test error measured on 50 examples is itself uncertain: another 50 examples would give a different number. A confidence interval puts a range around the measured error that reflects how many test examples we had.`,
     slides: [slide('L2', 140, 'Confidence intervals'), slide('L2', 141, 'Confidence-interval exercise')],
-    slideNote: R`The body-row interval (row 4) is added; the slide works only the face row.`,
+    slideNote: R`The derivation of the standard error (rows 1 to 3) and the body-row interval (row 7) are added; the slide works only the face row.`,
     pre: [
       text('A 95% confidence-interval procedure covers the fixed population quantity in 95% of repeated samples, under its sampling assumptions.'),
       warn('Width depends on sample size and assumptions about independent observations. Small samples or rates near 0 or 1 may need a better interval method.'),
     ],
     rows: [
+      {
+        eq: R`\operatorname{Var}(Z_i)=\mathbb E[Z_i^2]-\mathbb E[Z_i]^2=e-e^2=e(1-e)`,
+        notes: [
+          lab(R`$Z_i=1$ if test example $i$ is misclassified, else 0, so $Z_i^2=Z_i$ and $\mathbb E[Z_i^2]=\mathbb E[Z_i]=e$`),
+          lab(R`$e$ is the true error probability; shapes: $Z_i,e:\ 1\times1$`),
+        ],
+      },
+      {
+        eq: R`\operatorname{Var}(\hat e)=\operatorname{Var}\Big(\frac1N\sum_{i=1}^{N}Z_i\Big)=\frac1{N^2}\sum_{i=1}^{N}\operatorname{Var}(Z_i)=\frac{N\,e(1-e)}{N^2}=\frac{e(1-e)}{N}`,
+        notes: [tag(['I86'], R`the constant $\tfrac1N$ comes out squared, and the variances of independent terms add; all $N$ terms are equal, so the sum is $N$ times one`)],
+      },
+      {
+        eq: R`\text{SE}(\hat e)=\sqrt{\operatorname{Var}(\hat e)}=\sqrt{\frac{e(1-e)}{N}}\approx\sqrt{\frac{\hat e(1-\hat e)}{N}}`,
+        notes: [lab(R`the true $e$ is unknown, so substitute the observed $\hat e$; the standard error is the typical size of $\hat e-e$`)],
+      },
       {
         eq: R`\hat e\ \pm\ 1.96\sqrt{\frac{\hat e(1-\hat e)}{N_{\text{test}}}}`,
         notes: [
@@ -121,15 +140,15 @@ const sections: Section[] = [
         notes: [lab('original emotion-recognition example: 156 training samples, 50 test samples from three subjects')],
       },
       {
-        eq: R`\text{Face: }\hat e=1-0.78=0.22:\quad0.22\pm1.96\sqrt{\frac{0.22\times0.78}{50}}\approx0.22\pm0.115`,
+        eq: R`\text{Face: }\hat e=1-0.78=0.22:\quad0.22\pm1.96\sqrt{\frac{0.22\times0.78}{50}}=0.22\pm1.96\sqrt{\frac{0.1716}{50}}=0.22\pm1.96\sqrt{0.003432}=0.22\pm1.96(0.0586)\approx0.22\pm0.115`,
         notes: [
-          ex('about [0.105, 0.335]'),
+          ex('endpoints: 0.22 − 0.115 = 0.105 and 0.22 + 0.115 = 0.335, so about [0.105, 0.335]'),
           warn('treating the 50 observations as independent; dependence between observations (e.g. only three subjects) changes this calculation'),
         ],
       },
       {
-        eq: R`\text{Body: }\hat e=0.10:\quad0.10\pm1.96\sqrt{\frac{0.10\times0.90}{50}}\approx0.10\pm0.083`,
-        notes: [ex('about [0.017, 0.183]; the two intervals overlap, and the rows also differ in classes and features, so they are not a like-for-like comparison')],
+        eq: R`\text{Body: }\hat e=0.10:\quad0.10\pm1.96\sqrt{\frac{0.10\times0.90}{50}}=0.10\pm1.96\sqrt{\frac{0.09}{50}}=0.10\pm1.96\sqrt{0.0018}=0.10\pm1.96(0.0424)\approx0.10\pm0.083`,
+        notes: [ex('endpoints: 0.10 − 0.083 = 0.017 and 0.10 + 0.083 = 0.183, so about [0.017, 0.183]; the two intervals overlap, and the rows also differ in classes and features, so they are not a like-for-like comparison')],
       },
     ],
   },
@@ -146,7 +165,7 @@ const sections: Section[] = [
     rows: [
       {
         eq: R`\begin{array}{l|l}\text{Paired outcome} & \text{What it tells us}\\ \hline\text{Both correct or both wrong} & \text{No difference on this example}\\ \text{Only classifier A correct} & \text{Evidence favouring A}\\ \text{Only classifier B correct} & \text{Evidence favouring B}\end{array}`,
-        notes: [ex('if A and B disagree on 10 examples and A is right on 8 of them, the evidence is those 10, not the full test set')],
+        notes: [ex('if A and B disagree on 10 examples and A is right on 8 of them (so B is right on the other 2), the evidence is those 10 disagreements, not the full test set')],
       },
     ],
   },

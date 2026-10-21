@@ -33,8 +33,8 @@ const sections: Section[] = [
         notes: [lab('predict the class with the largest averaged probability'), lab(R`an average of distributions is still a distribution: $\sum_cp_c=1$`)],
       },
       {
-        eq: R`K=3,\ \ p_{c,k}(\mathbf x)=0.6,\ 0.9,\ 0.3:\quad p_c(\mathbf x)=\tfrac13(0.6+0.9+0.3)=0.6`,
-        notes: [ex('one class, three trees')],
+        eq: R`K=3,\ \ p_{c,k}(\mathbf x)=0.6,\ 0.9,\ 0.3:\quad p_c(\mathbf x)=\tfrac13(0.6+0.9+0.3)=\tfrac13(1.8)=0.6`,
+        notes: [ex('one class, three trees: add the three probabilities (0.6 + 0.9 = 1.5, then 1.5 + 0.3 = 1.8), then divide by K = 3')],
       },
     ],
   },
@@ -74,7 +74,7 @@ const sections: Section[] = [
     title: 'A bootstrap sample',
     why: R`A concrete bootstrap sample shows the two facts that matter: some examples appear more than once, and some not at all. The ones left out give each tree a free validation set.`,
     slides: [slide('L2', 102, 'A bootstrap sample')],
-    slideNote: R`Rows 3 and 4 (how many are left out on average) are added.`,
+    slideNote: R`Rows 3 to 7 (how many are left out on average, derived step by step) are added.`,
     rows: [
       {
         eq: R`\text{original indices: }1\ 2\ 3\ 4\ 5\ 6\qquad\longrightarrow\qquad\text{one bootstrap sample: }1\ 1\ 2\ 4\ 4\ 6`,
@@ -88,12 +88,30 @@ const sections: Section[] = [
         notes: [lab('evaluate them using only trees that omitted them during fitting'), lab('at each node, also sample candidate features')],
       },
       {
-        eq: R`N=6:\quad\Big(1-\tfrac16\Big)^{6}=0.335`,
-        notes: [tag(['I82'], 'chance that a given example is left out of one bootstrap sample'), ex('here 2 of 6 were left out, close to the expected 2.0')],
+        eq: R`P(i\text{ missed by one draw})=\frac{N-1}{N}=1-\frac1N`,
+        notes: [lab(R`one draw picks one of the $N$ examples uniformly, so it avoids example $i$ in $N-1$ of the $N$ equally likely cases`)],
       },
       {
-        eq: R`N\to\infty:\quad\Big(1-\tfrac1N\Big)^{N}\to e^{-1}=0.368`,
-        notes: [tag(['I82'], 'about a third of the data is out-of-bag for each tree')],
+        eq: R`P(i\text{ missed by all }N\text{ draws})=\underbrace{\Big(1-\frac1N\Big)\Big(1-\frac1N\Big)\cdots\Big(1-\frac1N\Big)}_{N\text{ factors}}=\Big(1-\frac1N\Big)^{N}`,
+        notes: [tag(['I82'], 'the draws are independent, so the probabilities multiply')],
+      },
+      {
+        eq: R`N=6:\quad\Big(1-\tfrac16\Big)^{6}=\Big(\tfrac56\Big)^{6}=\frac{5^6}{6^6}=\frac{15625}{46656}=0.335`,
+        notes: [
+          tag(['I82'], 'chance that a given example is left out of one bootstrap sample'),
+          ex(R`expected number left out: $6\times0.335=2.01$. Here 2 of 6 were left out, close to the expected 2.0`),
+        ],
+      },
+      {
+        eq: R`\ln\Big(1-\frac1N\Big)^{N}=N\ln\Big(1-\frac1N\Big)=N\Big(-\frac1N-\frac1{2N^2}-\cdots\Big)=-1-\frac1{2N}-\cdots\ \longrightarrow\ -1`,
+        notes: [
+          lab(R`take the log, then use the series $\ln(1-x)=-x-\tfrac{x^2}2-\cdots$ with $x=1/N$ (a standard series, quoted not proved)`),
+          lab(R`every term after $-1$ has a factor of $1/N$ or smaller, so it vanishes as $N\to\infty$`),
+        ],
+      },
+      {
+        eq: R`N\to\infty:\quad\Big(1-\tfrac1N\Big)^{N}=e^{\ln(\cdots)}\to e^{-1}=0.368`,
+        notes: [tag(['I82'], 'about a third of the data is out-of-bag for each tree, so about 63% appear in its bootstrap sample')],
       },
     ],
   },
@@ -167,6 +185,7 @@ const sections: Section[] = [
       {
         eq: R`\mathbf x=(x_1,x_2)^\top,\qquad h_n(\mathbf x)=w_{n1}x_1+w_{n2}x_2\ \ \text{tested against}\ \ \theta_n`,
         notes: [
+          ex(R`with $\mathbf w_n=(1,2)^\top$, $\theta_n=3$ and $\mathbf x=(2,0.4)^\top$: $h_n(\mathbf x)=1\cdot2+2\cdot0.4=2.8<3$, so $\mathbf x$ goes to the left child`),
           lab('four classes: purple, blue, red, green'),
           lab(R`$h_n(\mathbf x)<\theta_n$ is one side of a slanted line; random $(w_{n1},w_{n2})$ give random directions`),
           shape(R`\mathbf x:\ 2\times1,\quad h_n(\mathbf x),\theta_n:\ 1\times1`),

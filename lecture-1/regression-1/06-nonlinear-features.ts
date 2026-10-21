@@ -113,7 +113,14 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`\mathbf w^\top\boldsymbol\phi(\mathbf x)=w_0+w_1x_1+w_2x_2+w_3x_1^2+w_4x_2^2+w_5x_1x_2`,
+        eq: R`M=\underbrace{1}_{\text{constant}}+\underbrace{2}_{x_1,\,x_2}+\underbrace{2}_{x_1^2,\,x_2^2}+\underbrace{1}_{x_1x_2}=6`,
+        notes: [
+          lab(R`count the features by type: the constant, the two linear terms, the two squares and the single cross term (the products of two different coordinates: only $x_1x_2$)`),
+          shape(R`M:\ 1\times1`),
+        ],
+      },
+      {
+        eq: R`\mathbf w^\top\boldsymbol\phi(\mathbf x)=\begin{bmatrix}w_0 & w_1 & w_2 & w_3 & w_4 & w_5\end{bmatrix}\begin{bmatrix}1\\ x_1\\ x_2\\ x_1^2\\ x_2^2\\ x_1x_2\end{bmatrix}=w_0+w_1x_1+w_2x_2+w_3x_1^2+w_4x_2^2+w_5x_1x_2`,
         notes: [
           tag(['I12'], 'dot product of six coefficients with six features'),
           shape(R`(1\times6)(6\times1)=1\times1`),
@@ -148,6 +155,13 @@ const sections: Section[] = [
         ],
       },
       {
+        eq: R`(\Phi\mathbf w)_i=\sum_{j=1}^{M}\Phi_{ij}w_j=\sum_{j=1}^{M}\phi_j(\mathbf x_i)\,w_j=\mathbf w^\top\boldsymbol\phi(\mathbf x_i)=\hat y_i`,
+        notes: [
+          ex(R`entry $i$ of the product $\Phi\mathbf w$ is row $i$ of $\Phi$ times $\mathbf w$; substitute $\Phi_{ij}=\phi_j(\mathbf x_i)$; the sum over $j$ is a dot product (I12)`),
+          shape(R`\Phi\mathbf w:\ (N\times M)(M\times1)=N\times1,\qquad \text{entry }i:\ 1\times1`),
+        ],
+      },
+      {
         eq: R`\mathbf y=\Phi\mathbf w+\boldsymbol\epsilon,\qquad \mathbf y,\boldsymbol\epsilon\in\mathbb R^N,\quad \mathbf w\in\mathbb R^M`,
         notes: [
           lab(R`all $N$ predictions at once`),
@@ -162,7 +176,7 @@ const sections: Section[] = [
     title: 'Least squares with features',
     why: R`The loss has the same form as before with $\Phi$ in place of $X$. So we do not need a new derivation: every step of the matrix least-squares topic goes through with $X\to\Phi$ and $D+1\to M$.`,
     slides: [slide('I', 48, 'A design matrix for nonlinear features')],
-    slideNote: R`Rows 2 and 3 are added: they apply the result of the matrix least-squares topic with $\Phi$ in place of $X$. The slide says only "Minimise it over the same coefficient vector".`,
+    slideNote: R`Rows 2 to 6 are added: they repeat the steps of the matrix least-squares topic with $\Phi$ in place of $X$, written out in full. The slide says only "Minimise it over the same coefficient vector".`,
     derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
@@ -174,16 +188,41 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`\Phi^\top\Phi\,\hat{\mathbf w}=\Phi^\top\mathbf y`,
+        eq: R`=(\mathbf y-\Phi\mathbf w)^\top(\mathbf y-\Phi\mathbf w)=\mathbf y^\top\mathbf y-\mathbf y^\top\Phi\mathbf w-\mathbf w^\top\Phi^\top\mathbf y+\mathbf w^\top\Phi^\top\Phi\mathbf w`,
+        notes: [
+          tag(['I2'], R`$(\Phi\mathbf w)^\top=\mathbf w^\top\Phi^\top$; then multiply out the four products`),
+          shape(R`\text{each of the four terms: }1\times1`),
+        ],
+      },
+      {
+        eq: R`=\mathbf y^\top\mathbf y-2\,\mathbf y^\top\Phi\mathbf w+\mathbf w^\top\Phi^\top\Phi\mathbf w`,
+        notes: [
+          tag(['I3'], R`$\mathbf w^\top\Phi^\top\mathbf y$ is a scalar, so it equals its transpose $\mathbf y^\top\Phi\mathbf w$; the two middle terms add`),
+        ],
+      },
+      {
+        eq: R`\nabla_{\mathbf w}L=\mathbf 0-2\,\Phi^\top\mathbf y+2\,\Phi^\top\Phi\,\mathbf w`,
+        notes: [
+          tag(['I8'], R`differentiate term by term. $\mathbf y^\top\mathbf y$ has no $\mathbf w$, so its gradient is $\mathbf 0$`),
+          tag(['I4'], R`$\nabla_{\mathbf w}(\mathbf y^\top\Phi\mathbf w)=\Phi^\top\mathbf y$ (take $\mathbf a=\Phi^\top\mathbf y$)`),
+          tag(['I5'], R`$\nabla_{\mathbf w}(\mathbf w^\top A\mathbf w)=2A\mathbf w$ for symmetric $A=\Phi^\top\Phi$`),
+          shape(R`\nabla_{\mathbf w}L:\ M\times1`),
+        ],
+      },
+      {
+        eq: R`\nabla_{\mathbf w}L(\hat{\mathbf w})=-2\Phi^\top\mathbf y+2\Phi^\top\Phi\,\hat{\mathbf w}=\mathbf 0\ \Rightarrow\ \Phi^\top\Phi\,\hat{\mathbf w}=\Phi^\top\mathbf y`,
         notes: [
           term('Normal Equation'),
-          tag(['I2', 'I3', 'I4', 'I5', 'I8'], R`same expansion and gradient steps as with $X$, then set the gradient to zero`),
+          ex(R`set the gradient to zero, add $2\Phi^\top\mathbf y$ to both sides, divide by 2`),
           shape(R`(M\times N)(N\times M)(M\times1)=(M\times N)(N\times1)=M\times1`),
         ],
       },
       {
-        eq: R`\hat{\mathbf w}=(\Phi^\top\Phi)^{-1}\Phi^\top\mathbf y`,
+        eq: R`(\Phi^\top\Phi)^{-1}\Phi^\top\Phi\,\hat{\mathbf w}=(\Phi^\top\Phi)^{-1}\Phi^\top\mathbf y\ \Rightarrow\ \hat{\mathbf w}=(\Phi^\top\Phi)^{-1}\Phi^\top\mathbf y`,
         notes: [
+          ex(R`multiply both sides on the left by $(\Phi^\top\Phi)^{-1}$; on the left $A^{-1}A=I$ and $I\hat{\mathbf w}=\hat{\mathbf w}$`),
+          tag(['I6'], R`the inverse exists when $\Phi^\top\Phi$ is invertible`),
+
           tag(['I6'], R`with $\Phi$ for $X$ and $M$ for $D+1$: needs full column rank, $\operatorname{rank}(\Phi)=M$`),
           shape(R`(M\times M)(M\times N)(N\times1)=M\times1`),
         ],
@@ -205,6 +244,14 @@ const sections: Section[] = [
         notes: [
           lab('an exact fit may not exist: solve for the smallest residual norm instead'),
           shape(R`\Phi:\ N\times M\ \text{(tall)}`),
+        ],
+      },
+      {
+        eq: R`\begin{bmatrix}1&0\\1&1\\1&2\end{bmatrix}\begin{bmatrix}w_0\\ w_1\end{bmatrix}=\begin{bmatrix}0\\1\\0\end{bmatrix}\ \Rightarrow\ \begin{cases}w_0=0\\ w_0+w_1=1\\ w_0+2w_1=0\end{cases}`,
+        notes: [
+          ex(R`small example, $N=3$ equations, $M=2$ unknowns: the points $(0,0),(1,1),(2,0)$ with $\boldsymbol\phi(x)=[1,x]^\top$`),
+          ex(R`the first two equations give $w_0=0,\ w_1=1$; then the third gives $0+2\cdot1=2\ne0$, a contradiction, so no line passes through all three points`),
+          shape(R`\Phi:\ 3\times2,\quad \mathbf w:\ 2\times1,\quad \mathbf y:\ 3\times1`),
         ],
       },
       {
@@ -242,8 +289,10 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`\operatorname{rank}(\Phi^\top\Phi)\le N<M`,
+        eq: R`\operatorname{rank}(\Phi^\top\Phi)=\operatorname{rank}(\Phi)\le\min(N,M)=N<M`,
         notes: [
+          ex(R`rank is at most the smaller of the number of rows and columns; here $N<M$, so the minimum is $N$`),
+          ex(R`$\Phi^\top\Phi$ has $M$ columns but rank below $M$, so it is not full rank: a square matrix of rank below its size has no inverse`),
           tag(['I19'], R`the $M\times M$ matrix $\Phi^\top\Phi$ is singular, so $(\Phi^\top\Phi)^{-1}$ does not exist`),
           warn(R`the formula $(\Phi^\top\Phi)^{-1}\Phi^\top\mathbf y$ cannot be used when $M>N$`),
           shape(R`\Phi^\top\Phi:\ M\times M`),

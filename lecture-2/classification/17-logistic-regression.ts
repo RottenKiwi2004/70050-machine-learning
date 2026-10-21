@@ -51,6 +51,12 @@ const sections: Section[] = [
         ],
       },
       {
+        eq: R`=\Big(\frac{1}{\sqrt{2\pi\sigma^2}}\Big)^{N}\prod_{i=1}^{N}\exp\!\Big[-\frac{(y_i-\mathbf w^\top\mathbf x_i)^2}{2\sigma^2}\Big]=(2\pi\sigma^2)^{-N/2}\exp\!\Big[\sum_{i=1}^{N}-\frac{(y_i-\mathbf w^\top\mathbf x_i)^2}{2\sigma^2}\Big]`,
+        notes: [
+          tag(['I66'], R`the constant factor repeated $N$ times is its $N$-th power: $\big((2\pi\sigma^2)^{-1/2}\big)^N=(2\pi\sigma^2)^{-N/2}$; and $\prod_ie^{a_i}=e^{\sum_ia_i}$`),
+        ],
+      },
+      {
         eq: R`=(2\pi\sigma^2)^{-N/2}\exp\!\Big[-\frac{1}{2\sigma^2}\sum_{i=1}^{N}(y_i-\mathbf w^\top\mathbf x_i)^2\Big]`,
         notes: [
           tag(['I66'], 'the constant factors multiply to a power; the exponentials combine into one'),
@@ -103,7 +109,14 @@ const sections: Section[] = [
         notes: [lab('write 1 with the same denominator')],
       },
       {
-        eq: R`\frac{g(a)}{1-g(a)}=\frac{1}{e^{-a}}=e^{a}\quad\Longrightarrow\quad\log\frac{g(a)}{1-g(a)}=a`,
+        eq: R`1-g(a)=\frac{e^{-a}}{1+e^{-a}}=\frac{e^{-a}\,e^{a}}{(1+e^{-a})\,e^{a}}=\frac{1}{e^{a}+1}=\frac{1}{1+e^{a}}=g(-a)`,
+        notes: [
+          ex(R`multiply top and bottom by $e^{a}$; then $e^{-a}e^{a}=e^{0}=1$ and $(1+e^{-a})e^{a}=e^{a}+1$`),
+          tag(['I64'], R`so $1-g(a)=g(-a)$: flipping the sign of the score swaps the two classes' probabilities`),
+        ],
+      },
+      {
+        eq: R`\frac{g(a)}{1-g(a)}=\frac{1/(1+e^{-a})}{e^{-a}/(1+e^{-a})}=\frac{1}{e^{-a}}=e^{a}\quad\Longrightarrow\quad\log\frac{g(a)}{1-g(a)}=a`,
         notes: [
           tag(['I36'], R`$\log e^{a}=a$`),
           term('Log-odds (logit)'),
@@ -130,8 +143,11 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`z=\mathbf w^\top\mathbf x=2:\quad p=\frac{1}{1+e^{-2}}=0.881,\qquad z=0:\ p=0.5,\qquad z=-2:\ p=0.119`,
-        notes: [ex(R`the boundary $z=0$ is exactly where the model says 50/50`)],
+        eq: R`z=2:\ p=\frac{1}{1+e^{-2}}=\frac{1}{1+0.1353}=\frac{1}{1.1353}=0.881,\qquad z=0:\ p=\frac{1}{1+e^{0}}=\frac12,\qquad z=-2:\ p=\frac{1}{1+e^{2}}=\frac{1}{1+7.389}=0.119`,
+        notes: [
+          ex(R`the boundary $z=0$ is exactly where the model says 50/50`),
+          lab(R`check: $0.881+0.119=1$, as $1-g(a)=g(-a)$ requires`),
+        ],
       },
     ],
   },
@@ -163,8 +179,15 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`=\sum_{i=1}^{N}\big\{y_i\log p_i+(1-y_i)\log(1-p_i)\big\}`,
-        notes: [tag(['I34', 'I36'], R`$\log(a^{y}b^{1-y})=y\log a+(1-y)\log b$`)],
+        eq: R`\log\big[p_i^{y_i}(1-p_i)^{1-y_i}\big]=\log p_i^{y_i}+\log(1-p_i)^{1-y_i}=y_i\log p_i+(1-y_i)\log(1-p_i)`,
+        notes: [
+          tag(['I34'], 'the log of a product is the sum of the logs'),
+          tag(['I36'], R`$\log a^{k}=k\log a$, with $k=y_i$ and $k=1-y_i$`),
+        ],
+      },
+      {
+        eq: R`\log p(\mathbf y\mid X;\mathbf w)=\sum_{i=1}^{N}\big\{y_i\log p_i+(1-y_i)\log(1-p_i)\big\}`,
+        notes: [lab('put the per-example result back inside the sum over examples')],
       },
     ],
   },
@@ -201,7 +224,7 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`y_i=1:\quad p_i=0.9\Rightarrow\ell=0.105,\qquad p_i=0.5\Rightarrow\ell=0.693,\qquad p_i=0.1\Rightarrow\ell=2.303`,
+        eq: R`y_i=1:\quad \ell=-\log p_i:\quad p_i=0.9\Rightarrow-\log0.9=0.105,\qquad p_i=0.5\Rightarrow-\log0.5=\log2=0.693,\qquad p_i=0.1\Rightarrow-\log0.1=\log10=2.303`,
         notes: [ex('confident and right costs little; confident and wrong costs a lot')],
       },
     ],
@@ -216,7 +239,7 @@ const sections: Section[] = [
       slide('L2', 24, 'Log loss'),
       slide('L2', 146, 'Signed-label probabilities (appendix)'),
     ],
-    slideNote: R`Rows 1 to 4 are the appendix derivation (slide 146) behind slide 23's first line. Slide 24 plots row 6 against the 0–1 loss. The numeric row is added.`,
+    slideNote: R`The first rows are the appendix derivation (slide 146) behind slide 23's first line. Slide 24 plots the log-loss row against the 0–1 loss. The numeric row is added.`,
     pre: [text(R`Use the margin defined earlier, with signed labels $y_\pm\in\{-1,+1\}$.`)],
     derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
@@ -229,8 +252,11 @@ const sections: Section[] = [
         notes: [lab('the two probabilities add to 1')],
       },
       {
-        eq: R`=\frac{1}{1+\exp[f_{\mathbf w}(\mathbf x)]}`,
-        notes: [tag(['I64'], R`divide top and bottom by $\exp[-f]$: $1-g(f)=g(-f)$`)],
+        eq: R`=\frac{\exp[-f_{\mathbf w}(\mathbf x)]/\exp[-f_{\mathbf w}(\mathbf x)]}{\big(1+\exp[-f_{\mathbf w}(\mathbf x)]\big)/\exp[-f_{\mathbf w}(\mathbf x)]}=\frac{1}{\exp[f_{\mathbf w}(\mathbf x)]+1}=\frac{1}{1+\exp[f_{\mathbf w}(\mathbf x)]}`,
+        notes: [
+          tag(['I64'], R`divide top and bottom by $\exp[-f]$: $1-g(f)=g(-f)$`),
+          ex(R`top: $e^{-f}/e^{-f}=1$. Bottom: $\big(1+e^{-f}\big)/e^{-f}=e^{f}+1$, because $1/e^{-f}=e^{f}$ and $e^{-f}/e^{-f}=1$`),
+        ],
       },
       {
         eq: R`P(Y_\pm=y_\pm\mid\mathbf x;\mathbf w)=g(y_\pm f_{\mathbf w}(\mathbf x))=g(m)=\frac{1}{1+e^{-m}}`,
@@ -240,8 +266,8 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`\ell_{\log}(m)=-\log g(m)=\log(1+e^{-m})`,
-        notes: [tag(['I36'], R`$-\log\frac{1}{a}=\log a$`)],
+        eq: R`\ell_{\log}(m)=-\log g(m)=-\log\frac{1}{1+e^{-m}}=\log(1+e^{-m})`,
+        notes: [tag(['I36'], R`$-\log\frac{1}{a}=\log a$, with $a=1+e^{-m}$`)],
       },
       {
         eq: R`L(\mathbf w)=\sum_{i=1}^{N}\log(1+e^{-m_i}),\qquad m_i=y_{i\pm}\mathbf w^\top\mathbf x_i`,
@@ -252,7 +278,7 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`m=-2:\ 2.127,\qquad m=0:\ \log2=0.693,\qquad m=2:\ 0.127,\qquad m=3:\ 0.049`,
+        eq: R`m=-2:\ \log(1+e^{2})=\log(8.389)=2.127,\quad m=0:\ \log(1+1)=\log2=0.693,\quad m=2:\ \log(1+e^{-2})=\log(1.135)=0.127,\quad m=3:\ \log(1+e^{-3})=\log(1.050)=0.049`,
         notes: [
           ex('the slide 24 curve: decreasing everywhere, roughly linear for large negative m, never exactly 0'),
           lab(R`for $m\ll0$, $\log(1+e^{-m})\approx-m$: errors cost in proportion to their size, not its square`),
@@ -274,7 +300,10 @@ const sections: Section[] = [
       },
       {
         eq: R`\begin{array}{c|cccccc} m & -2 & -1 & 0 & 1 & 2 & 3\\ \hline \ell_{01} & 1 & 1 & \text{tie} & 0 & 0 & 0\\ \ell_{\text{sq}} & 9 & 4 & 1 & 0 & 1 & 4\\ \ell_{\log} & 2.13 & 1.31 & 0.69 & 0.31 & 0.13 & 0.05\end{array}`,
-        notes: [ex(R`read across: at $m=3$ the squared loss is back up to 4; the log loss is almost 0`)],
+        notes: [
+          ex(R`read across: at $m=3$ the squared loss is back up to 4; the log loss is almost 0`),
+          lab(R`how to fill a column, e.g. $m=-1$: $\ell_{\text{sq}}=(1-(-1))^2=4$; $\ell_{\log}=\log(1+e^{1})=\log3.718=1.31$`),
+        ],
       },
     ],
     callouts: [

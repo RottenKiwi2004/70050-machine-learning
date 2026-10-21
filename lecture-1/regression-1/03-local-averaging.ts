@@ -111,7 +111,7 @@ const sections: Section[] = [
     title: R`Gaussian kernel and bandwidth $h$`,
     why: 'k-NN gives full weight to the $k$ nearest points and zero to the rest, so the prediction jumps. A kernel instead gives each stored input a weight that falls off smoothly with its distance from the query.',
     slides: [slide('I', 25, 'A kernel assigns weights by distance')],
-    slideNote: R`Row 3 shows how the slide's value $K_h(\pm h)$ follows from the formula; row 2 (the peak value) is added. Figure: three bell curves centred at $x_i=0.6$ for $h=0.2$, $0.5$ and $1$; the larger $h$, the wider the bell.`,
+    slideNote: R`Row 3 shows how the slide's value $K_h(\pm h)$ follows from the formula; row 2 (the peak value) and row 4 (the arithmetic of $e^{-1/2}$) are added. Figure: three bell curves centred at $x_i=0.6$ for $h=0.2$, $0.5$ and $1$; the larger $h$, the wider the bell.`,
     rows: [
       {
         eq: R`K_h(x-x_i)=\exp\!\left[-\frac{(x_i-x)^2}{2h^2}\right],\qquad h>0`,
@@ -137,6 +137,13 @@ const sections: Section[] = [
           lab(R`one width $h$ from the centre, the weight has dropped to about $0.61$, whatever $h$ is`),
         ],
       },
+      {
+        eq: R`\frac{h^2}{2h^2}=\frac12,\qquad e^{-1/2}=\frac{1}{e^{1/2}}=\frac{1}{\sqrt e}=\frac{1}{1.6487}\approx0.6065`,
+        notes: [
+          ex(R`expand the arithmetic: $h^2$ divided by $2h^2$ is $\tfrac12$ for every $h>0$, and $e^{1/2}=\sqrt e\approx1.6487$`),
+          shape(R`1\times1`),
+        ],
+      },
     ],
     callouts: [
       {
@@ -157,7 +164,7 @@ const sections: Section[] = [
     title: R`Normalised weights $\alpha_i(x)$`,
     why: 'Kernel values on their own do not sum to anything in particular. Dividing each one by their total turns them into weights that sum to one, so the prediction becomes an average of targets rather than an arbitrary sum.',
     slides: [slide('I', 26, 'Kernel regression: a weighted average'), slide('I', 27, 'Kernel regression: a weighted average')],
-    slideNote: 'Row 1 is on both slides. Rows 2 to 4, the check that the weights sum to one, are added to show I9 and C2.',
+    slideNote: 'Row 1 is on both slides. Rows 2 to 6, the step-by-step check that the weights sum to one, are added to show I9 and C2.',
     derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
@@ -172,16 +179,29 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`\sum_{i=1}^{N}\alpha_i(x)=\frac{\sum_{i=1}^{N}K_h(x-x_i)}{\sum_{j=1}^{N}K_h(x-x_j)}`,
+        eq: R`\sum_{i=1}^{N}\alpha_i(x)=\sum_{i=1}^{N}\frac{K_h(x-x_i)}{D(x)},\qquad D(x):=\sum_{j=1}^{N}K_h(x-x_j)`,
         notes: [
-          ex('common denominator: add the numerators over the same denominator'),
+          ex(R`substitute row 1 for each $\alpha_i$ and give the denominator the short name $D(x)$`),
+          shape(R`D(x):\ 1\times1`),
+        ],
+      },
+      {
+        eq: R`=\frac{1}{D(x)}\sum_{i=1}^{N}K_h(x-x_i)`,
+        notes: [
+          con(R`$D(x)$ does not depend on $i$, so $\tfrac{1}{D(x)}$ is a constant factor and moves outside the sum over $i$`),
+        ],
+      },
+      {
+        eq: R`=\frac{\sum_{i=1}^{N}K_h(x-x_i)}{D(x)}=\frac{\sum_{i=1}^{N}K_h(x-x_i)}{\sum_{j=1}^{N}K_h(x-x_j)}`,
+        notes: [
+          ex('write the constant factor back as a denominator, then unfold the name D(x)'),
           shape(R`1\times1`),
         ],
       },
       {
         eq: R`=1`,
         notes: [
-          tag(['C2'], R`top and bottom are the same sum, with the index renamed`),
+          tag(['C2'], R`top and bottom are the same sum, with the index renamed from $i$ to $j$, so the fraction is $\tfrac{D(x)}{D(x)}=1$ (valid because $D(x)>0$)`),
         ],
       },
       {
@@ -199,7 +219,7 @@ const sections: Section[] = [
     title: 'Kernel regression prediction',
     why: 'With weights that sum to one, the prediction at $x$ is a weighted average of all stored targets, with nearby targets counting most. The bandwidth $h$ then decides how many neighbours effectively take part, which controls how smooth the curve is.',
     slides: [slide('I', 26, 'Kernel regression: a weighted average'), slide('I', 27, 'Kernel regression: a weighted average')],
-    slideNote: R`Row 1 is on both slides. Rows 2 and 3 are added. The two slides differ only in $h$; the readings of the weight bars are approximate. Rows 5 and 6 (the limits of $h$) are added, standard consequences of the formula.`,
+    slideNote: R`Row 1 is on both slides. Rows 2 to 7 are added (the dot-product form and the step-by-step proof of the bounds). The two slides differ only in $h$; the readings of the weight bars are approximate. The last rows (the limits of $h$, derived step by step) are added, standard consequences of the formula.`,
     pre: [lab(R`Both slides: $N=17$. Grey: observations. Blue: prediction. Red: query.`)],
     manim: 'KernelSmoothing', // animations/regression.py: kernel weights around a query point, for two bandwidths
     rows: [
@@ -219,6 +239,33 @@ const sections: Section[] = [
         ],
       },
       {
+        eq: R`y_{\max}:=\max_i y_i,\qquad y_{\min}:=\min_i y_i,\qquad y_{\min}\le y_i\le y_{\max}\ \text{ for every }i`,
+        notes: [
+          lab(R`$y_{\max}$ and $y_{\min}$ are the largest and smallest stored targets (both $1\times1$)`),
+          ex(R`start of the proof that the prediction is a weighted average sandwiched between them`),
+        ],
+      },
+      {
+        eq: R`\hat y(x)=\sum_{i=1}^{N}\alpha_i(x)\,y_i\ \le\ \sum_{i=1}^{N}\alpha_i(x)\,y_{\max}`,
+        notes: [
+          ex(R`each term: $\alpha_i(x)\ge0$ and $y_i\le y_{\max}$, so $\alpha_i(x)\,y_i\le\alpha_i(x)\,y_{\max}$ (multiplying an inequality by a non-negative number keeps its direction)`),
+          lab('add the $N$ inequalities'),
+        ],
+      },
+      {
+        eq: R`=y_{\max}\sum_{i=1}^{N}\alpha_i(x)=y_{\max}\cdot1=y_{\max}`,
+        notes: [
+          con(R`$y_{\max}$ does not depend on $i$, so it moves outside the sum`),
+          tag(['I9'], R`the weights sum to one`),
+        ],
+      },
+      {
+        eq: R`\hat y(x)=\sum_{i=1}^{N}\alpha_i(x)\,y_i\ \ge\ \sum_{i=1}^{N}\alpha_i(x)\,y_{\min}=y_{\min}\sum_{i=1}^{N}\alpha_i(x)=y_{\min}`,
+        notes: [
+          ex(R`same argument with $y_i\ge y_{\min}$ for the lower bound`),
+        ],
+      },
+      {
         eq: R`\min_i y_i\ \le\ \hat y(x)\ \le\ \max_i y_i`,
         notes: [
           tag(['I9'], 'a weighted average lies between the smallest and largest target'),
@@ -233,12 +280,40 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`h\to\infty:\quad K_h\to1\ \Rightarrow\ \alpha_i(x)\to\tfrac1N,\quad \hat y(x)\to\tfrac1N\sum_{i=1}^{N}y_i`,
+        eq: R`h\to\infty:\quad \frac{(x-x_i)^2}{2h^2}\to0\ \Rightarrow\ K_h(x-x_i)=\exp\!\left[-\frac{(x-x_i)^2}{2h^2}\right]\to e^{0}=1`,
+        notes: [
+          ex(R`for a fixed distance $|x-x_i|$ the exponent shrinks to 0 as $h$ grows`),
+          tag(['I10'], R`$e^0=1$, so every stored input gets the same kernel value`),
+        ],
+      },
+      {
+        eq: R`\alpha_i(x)=\frac{K_h(x-x_i)}{\sum_{j=1}^{N}K_h(x-x_j)}\to\frac{1}{\sum_{j=1}^{N}1}=\frac1N`,
+        notes: [
+          ex(R`substitute $K_h\to1$ in the numerator and in every term of the denominator; $\sum_{j=1}^{N}1=N$`),
+        ],
+      },
+      {
+        eq: R`\hat y(x)=\sum_{i=1}^{N}\alpha_i(x)\,y_i\to\sum_{i=1}^{N}\frac1N\,y_i=\frac1N\sum_{i=1}^{N}y_i`,
         notes: [lab('very wide kernel: every target counts equally, and the prediction is the overall mean')],
       },
       {
-        eq: R`h\to0:\quad \alpha_i(x)\to\begin{cases}1 & x_i\ \text{nearest to }x\\ 0 & \text{otherwise}\end{cases}`,
-        notes: [lab('very narrow kernel: the prediction copies the target of the single nearest input (1-NN), assuming one input is strictly nearest')],
+        eq: R`h\to0:\quad \text{let }n\text{ be the nearest, so }(x-x_i)^2>(x-x_n)^2\ \text{for }i\ne n`,
+        notes: [
+          lab(R`assume one stored input $x_n$ is strictly nearest to the query $x$ (no ties)`),
+        ],
+      },
+      {
+        eq: R`\frac{K_h(x-x_i)}{K_h(x-x_n)}=\exp\!\left[-\frac{(x-x_i)^2-(x-x_n)^2}{2h^2}\right]\to0`,
+        notes: [
+          ex(R`$e^{a}/e^{b}=e^{a-b}$. The numerator of the exponent is a positive constant $c>0$, so the exponent is $-\tfrac{c}{2h^2}\to-\infty$ as $h\to0$, and $e^{-\infty}\to0$`),
+        ],
+      },
+      {
+        eq: R`\alpha_n(x)=\frac{K_h(x-x_n)}{\sum_{j}K_h(x-x_j)}=\frac{1}{1+\sum_{j\ne n}K_h(x-x_j)/K_h(x-x_n)}\to\frac{1}{1+0}=1,\qquad \alpha_{i\ne n}(x)=\alpha_n(x)\cdot\frac{K_h(x-x_i)}{K_h(x-x_n)}\to1\cdot0=0`,
+        notes: [
+          ex(R`divide top and bottom by $K_h(x-x_n)$; the $j=n$ term of the denominator becomes $1$`),
+          lab('very narrow kernel: the prediction copies the target of the single nearest input (1-NN)'),
+        ],
       },
     ],
     callouts: [

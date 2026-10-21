@@ -43,15 +43,20 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`D=2:\quad w_0+w_1x_1+w_2x_2=0\ \iff\ x_2=-\frac{w_0+w_1x_1}{w_2}\quad(w_2\ne0)`,
+        eq: R`D=2:\quad w_0+w_1x_1+w_2x_2=0\ \iff\ w_2x_2=-(w_0+w_1x_1)\ \iff\ x_2=-\frac{w_0+w_1x_1}{w_2}\quad(w_2\ne0)`,
         notes: [
+          ex(R`subtract $w_0+w_1x_1$ from both sides, then divide both sides by $w_2$ (allowed when $w_2\ne0$)`),
           lab('in two measured dimensions the boundary is a line'),
           lab(R`in $D$ dimensions it is a flat surface (a hyperplane) with normal vector $(w_1,\dots,w_D)$`),
         ],
       },
       {
-        eq: R`\mathbf w=(-1,\,1,\,1)^\top:\quad z=-1+x_1+x_2,\qquad \mathbf x=(1,\,0.2,\,0.3)^\top\Rightarrow z=-0.5,\ \hat y=0`,
-        notes: [ex(R`the boundary is the line $x_1+x_2=1$; a point below it gets class 0`)],
+        eq: R`\mathbf w=(-1,\,1,\,1)^\top:\quad z=-1+x_1+x_2,\qquad \mathbf x=(1,\,0.2,\,0.3)^\top\Rightarrow z=(-1)(1)+(1)(0.2)+(1)(0.3)=-1+0.2+0.3=-0.5,\ \hat y=0`,
+        notes: [
+          ex(R`the boundary is the line $x_1+x_2=1$ (set $z=0$: $-1+x_1+x_2=0$); a point below it gets class 0`),
+          ex(R`here $x_1+x_2=0.2+0.3=0.5<1$, and $z=-0.5<0$, so $\hat y=\mathbb 1[z\ge0]=0$`),
+          shape(R`\mathbf w^\top\mathbf x:\ (1\times3)(3\times1)=1\times1`),
+        ],
       },
     ],
   },
@@ -112,13 +117,20 @@ const sections: Section[] = [
     title: 'Rewriting the quadratic loss in terms of the margin',
     why: R`Writing the squared loss as a function of the margin explains the picture: the loss is smallest at margin 1 and grows again for larger margins, so very confident correct predictions are punished like errors.`,
     slides: [slide('L2', 16, 'Rewriting the quadratic loss'), slide('L2', 17, 'Quadratic loss and classification margins')],
-    slideNote: 'Row 2 shows the factoring step that the slide states in words. The numeric examples are added.',
+    slideNote: 'The rows between the first and the last show the factoring step that the slide states in words. The numeric examples are added.',
     pre: [text('Use the signed labels and margin defined earlier.')],
     derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`\ell_{\text{sq}}=(y_\pm-z)^2`,
         notes: [lab(R`squared error between the target $\pm1$ and the score`), shape(R`1\times1`)],
+      },
+      {
+        eq: R`y_\pm(1-y_\pm z)=y_\pm-y_\pm^2z=y_\pm-z\ \Rightarrow\ y_\pm-z=y_\pm(1-y_\pm z)`,
+        notes: [
+          tag(['I63'], R`multiply $y_\pm$ into the bracket, then use $y_\pm^2=1$`),
+          shape(R`\text{every term: }1\times1`),
+        ],
       },
       {
         eq: R`=\big(y_\pm(1-y_\pm z)\big)^2`,
@@ -146,7 +158,7 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`m=-1:\ \ell_{\text{sq}}=4,\qquad m=1:\ \ell_{\text{sq}}=0,\qquad m=3:\ \ell_{\text{sq}}=4`,
+        eq: R`m=-1:\ (1-(-1))^2=2^2=4,\qquad m=1:\ (1-1)^2=0,\qquad m=3:\ (1-3)^2=(-2)^2=4`,
         notes: [
           ex(R`a correct prediction with margin 3 costs as much as a wrong one with margin $-1$`),
         ],

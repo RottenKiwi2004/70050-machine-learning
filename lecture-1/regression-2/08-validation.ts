@@ -90,6 +90,13 @@ const sections: Section[] = [
         ],
       },
       {
+        eq: R`K=5,\ \hat R_{\text{val}}^{(1..5)}=2.1,\,1.9,\,2.4,\,2.0,\,1.6:\quad \mathrm{CV}=\frac{2.1+1.9+2.4+2.0+1.6}{5}=\frac{10.0}{5}=2.0`,
+        notes: [
+          ex(R`made-up scores to show the arithmetic: add the five held-out scores, divide by $K=5$`),
+          shape(R`\mathrm{CV}:\ 1\times1`),
+        ],
+      },
+      {
         eq: R`\hat\lambda=\arg\min_{\lambda}\ \mathrm{CV}(\lambda)`,
         notes: [lab(R`compare candidate $\lambda$ values using this average and keep the best one`)],
       },
@@ -121,7 +128,7 @@ const sections: Section[] = [
     title: 'Standardising a feature',
     why: R`Ridge penalises every $w_j$ by the same $\lambda$, which is only fair if the features are on comparable scales. Standardising puts every feature at mean 0 and variance 1 before we regularise.`,
     slides: [slide('II', 7, 'Standardise features before regularising')],
-    slideNote: 'Row 1 is the slide. Rows 2 and 3 are added to show why the result has mean 0 and unit variance.',
+    slideNote: 'Row 1 is the slide. The other rows are added to show, step by step, why the result has mean 0 and unit variance.',
     pre: [text(R`Feature $j$: training mean $\mu_j$ and standard deviation $s_j>0$.`)],
     derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
@@ -135,17 +142,30 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`\frac1N\sum_{i=1}^{N}\widetilde x_{ij}=\frac{1}{s_j}\Big(\frac1N\sum_{i=1}^{N}x_{ij}-\htmlClass{c-orange}{\mu_j}\Big)=\frac{\mu_j-\mu_j}{s_j}=0`,
+        eq: R`\frac1N\sum_{i=1}^{N}\widetilde x_{ij}=\frac1N\sum_{i=1}^{N}\frac{x_{ij}-\mu_j}{s_j}=\frac{1}{s_j}\cdot\frac1N\Big(\sum_{i=1}^{N}x_{ij}-\sum_{i=1}^{N}\mu_j\Big)`,
         notes: [
-          tag(['I16'], R`pull the constant $1/s_j$ out of the sum; $\sum_i\mu_j=N\mu_j$`),
+          tag(['I16'], R`pull the constant $1/s_j$ out of the sum and split the sum of two terms`),
+        ],
+      },
+      {
+        eq: R`=\frac{1}{s_j}\Big(\frac1N\sum_{i=1}^{N}x_{ij}-\frac{N\mu_j}{N}\Big)=\frac{1}{s_j}\big(\htmlClass{c-orange}{\mu_j}-\mu_j\big)=\frac{\mu_j-\mu_j}{s_j}=0`,
+        notes: [
+          tag(['I16'], R`$\sum_{i=1}^N\mu_j=N\mu_j$ because $\mu_j$ does not depend on $i$`),
           lab(R`$\mu_j=\frac1N\sum_i x_{ij}$ is the training mean, so the bracket is zero`),
         ],
       },
       {
-        eq: R`\operatorname{Var}(\widetilde x_j)=\frac{1}{s_j^2}\operatorname{Var}(x_j)=\frac{s_j^2}{s_j^2}=1`,
+        eq: R`s_j^2=\frac1N\sum_{i=1}^{N}(x_{ij}-\mu_j)^2,\qquad \frac1N\sum_{i=1}^{N}\widetilde x_{ij}^{\,2}=\frac1N\sum_{i=1}^{N}\frac{(x_{ij}-\mu_j)^2}{s_j^2}=\frac{1}{s_j^2}\cdot\frac1N\sum_{i=1}^{N}(x_{ij}-\mu_j)^2`,
         notes: [
-          tag(['I26'], R`with $a=1/s_j$ and $b=-\mu_j/s_j$: the shift does nothing, the scale divides the variance by $s_j^2$`),
-          lab(R`variance over the training examples; $s_j^2$ is exactly that variance`),
+          lab(R`the variance of $\widetilde x_j$ is the mean of its squared deviations from its mean, and that mean is 0 (row above), so it is just the mean of $\widetilde x_{ij}^2$`),
+          con(R`$1/s_j^2$ does not depend on $i$, so it comes out of the sum`),
+        ],
+      },
+      {
+        eq: R`=\frac{1}{s_j^2}\cdot s_j^2=1,\qquad\text{so}\ \operatorname{Var}(\widetilde x_j)=\frac{1}{s_j^2}\operatorname{Var}(x_j)=1`,
+        notes: [
+          tag(['I26'], R`the same result from $\operatorname{Var}(aZ+b)=a^2\operatorname{Var}(Z)$ with $a=1/s_j$ and $b=-\mu_j/s_j$: the shift does nothing, the scale divides the variance by $s_j^2$`),
+          lab(R`the algebra is the same if $s_j^2$ is defined with $\frac1{N-1}$, as long as the variance uses that same convention`),
           lab('unit variance gives each feature a comparable scale'),
         ],
       },
@@ -157,7 +177,7 @@ const sections: Section[] = [
     title: 'Rescaling leaves predictions unchanged',
     why: R`To see why scale matters for ridge, change a feature's units and compensate in its weight. The model makes exactly the same predictions, so the data-fit term cannot tell the two versions apart.`,
     slides: [slide('II', 7, 'Standardise features before regularising')],
-    slideNote: 'The slide gives the substitution (row 2). Rows 1 and 3 are added to show why the predictions do not change.',
+    slideNote: 'The slide gives the substitution (row 2). The other rows are added to show why the predictions do not change.',
     pre: [text(R`Scale feature $x_j$ by a nonzero factor $c$ and its coefficient $w_j$ by $1/c$.`)],
     derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
@@ -173,11 +193,18 @@ const sections: Section[] = [
         notes: [lab(R`$\mapsto$ reads "is replaced by"; only feature $j$ and its own weight change`), shape(R`c:\ 1\times1`)],
       },
       {
-        eq: R`\frac{w_j}{c}\,(c\,x_j)=w_j\,x_j`,
+        eq: R`\frac{w_j}{c}\,(c\,x_j)=\frac{w_j\,c\,x_j}{c}=w_j\,x_j`,
         notes: [
+          ex(R`multiply the two factors, then cancel $c$ top and bottom (allowed because $c\ne0$)`),
           lab(R`the $c$ cancels, so term $j$, and therefore $\hat y$, is unchanged`),
           lab(R`so the squared-error term $\lVert\mathbf y-X\mathbf w\rVert_2^2$ is unchanged too`),
           shape(R`\text{every factor: }1\times1`),
+        ],
+      },
+      {
+        eq: R`\hat y_{\text{new}}=w_0+\sum_{k\ne j}w_kx_k+\frac{w_j}{c}(c\,x_j)=w_0+\sum_{k\ne j}w_kx_k+w_jx_j=\hat y`,
+        notes: [
+          ex(R`only term $j$ changes; every other term $w_kx_k$ is untouched, and term $j$ is unchanged by the row above`),
         ],
       },
     ],
@@ -200,11 +227,11 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`c=100:\quad \lambda w_j^2\ \mapsto\ \frac{\lambda w_j^2}{10\,000}`,
+        eq: R`c=100:\quad \lambda w_j^2\ \mapsto\ \lambda\Big(\frac{w_j}{100}\Big)^2=\frac{\lambda w_j^2}{100^2}=\frac{\lambda w_j^2}{10\,000}`,
         notes: [ex(R`100 times larger feature: penalty divided by 10,000`)],
       },
       {
-        eq: R`c=0.1:\quad \lambda w_j^2\ \mapsto\ \frac{\lambda w_j^2}{0.01}=100\,\lambda w_j^2`,
+        eq: R`c=0.1:\quad \lambda w_j^2\ \mapsto\ \lambda\Big(\frac{w_j}{0.1}\Big)^2=\frac{\lambda w_j^2}{0.1^2}=\frac{\lambda w_j^2}{0.01}=100\,\lambda w_j^2`,
         notes: [ex(R`0.1 times the feature: penalty multiplied by 100`)],
       },
     ],

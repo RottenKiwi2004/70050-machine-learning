@@ -169,13 +169,21 @@ const sections: Section[] = [
     title: "Bayes' rule, worked",
     why: R`We often know how likely the evidence is under each cause ($p(\text{apple}\mid\text{box})$) but want the reverse: which cause is likely given the evidence. Bayes' rule flips the conditioning, and the same prior-times-likelihood idea gives MAP estimation and ridge later.`,
     slides: [slide('II', 13, 'Bayes’ rule: reverse the conditioning')],
-    slideNote: R`Row 3 expands the evidence with the sum and product rules, and row 5 (the blue posterior) is added as a check.`,
+    slideNote: R`The first two rows derive Bayes' rule from the product rule, the evidence row expands it with the sum and product rules, and the last row (the blue posterior) is added as a check.`,
     pre: [text('Observed: an apple. Which box did it come from?')],
     derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
-        eq: R`p(B=b\mid Y=a)=\frac{p(Y=a\mid B=b)\,p(B=b)}{p(Y=a)}`,
+        eq: R`p(Y=a,B=b)=p(Y=a\mid B=b)\,p(B=b)=p(B=b\mid Y=a)\,p(Y=a)`,
         notes: [
+          tag(['I29'], R`the product rule applied twice: the joint can be split in either order, box first or fruit first`),
+          lab(R`both products equal the same joint probability, so they equal each other`),
+        ],
+      },
+      {
+        eq: R`p(B=b\mid Y=a)\,p(Y=a)=p(Y=a\mid B=b)\,p(B=b)\ \Rightarrow\ p(B=b\mid Y=a)=\frac{p(Y=a\mid B=b)\,p(B=b)}{p(Y=a)}`,
+        notes: [
+          ex(R`divide both sides by $p(Y=a)$, which needs $p(Y=a)>0$`),
           term('Bayes’ rule'),
           tag(['I30'], 'reverse the conditioning: from fruit-given-box to box-given-fruit'),
           lab(R`$B$: box colour; $Y$: fruit; $a$: apple; $b$ here is any box value`),
@@ -195,21 +203,24 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`p(Y=a)=\underbrace{0.25\times0.40}_{\text{red}}+\underbrace{0.75\times0.60}_{\text{blue}}=0.10+0.45=0.55`,
+        eq: R`p(Y=a)=\sum_{B}p(Y=a,B)=\underbrace{0.25\times0.40}_{\text{red}}+\underbrace{0.75\times0.60}_{\text{blue}}=0.10+0.45=0.55`,
         notes: [
+          ex(R`$0.25\times0.40=0.10$ and $0.75\times0.60=0.45$ (multiply $25\times40=1000$, then place the decimal point)`),
           tag(['I28', 'I29'], 'evidence: sum over boxes of likelihood times prior; same as the apple row total'),
         ],
       },
       {
-        eq: R`p(B=r\mid Y=a)=\frac{0.25\times0.40}{0.55}=\frac{2}{11}\simeq0.182`,
+        eq: R`p(B=r\mid Y=a)=\frac{0.25\times0.40}{0.55}=\frac{0.10}{0.55}=\frac{10}{55}=\frac{2}{11}\simeq0.182`,
         notes: [
+          ex(R`multiply top and bottom by 100 to get $10/55$, then divide both by 5; $2\div11=0.1818\ldots$`),
           tag(['I30'], R`likelihood $0.25$, prior $0.40$, evidence $0.55$`),
           lab(R`the red prior was $0.40$; after seeing an apple it drops to about $0.18$`),
         ],
       },
       {
-        eq: R`p(B=b\mid Y=a)=\frac{0.75\times0.60}{0.55}=\frac{9}{11}\simeq0.818=1-\frac{2}{11}`,
+        eq: R`p(B=b\mid Y=a)=\frac{0.75\times0.60}{0.55}=\frac{0.45}{0.55}=\frac{45}{55}=\frac{9}{11}\simeq0.818=1-\frac{2}{11}`,
         notes: [
+          ex(R`$45/55$ divided top and bottom by 5 is $9/11$; and $\tfrac{2}{11}+\tfrac{9}{11}=\tfrac{11}{11}=1$`),
           lab(R`here $b$ means blue`),
           tag(['I27'], 'the two posteriors add to 1, a quick check'),
           term('An apple makes the blue box more likely'),
@@ -257,8 +268,11 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`\Pr(a<X\le b)=P(b)-P(a)`,
-        notes: [tag(['I31'], 'area up to $b$ minus area up to $a$')],
+        eq: R`\Pr(a<X\le b)=\int_a^b p(t)\,\mathrm dt=\int_{-\infty}^{b}p(t)\,\mathrm dt-\int_{-\infty}^{a}p(t)\,\mathrm dt=P(b)-P(a)`,
+        notes: [
+          ex(R`the area from $a$ to $b$ is the area from $-\infty$ to $b$ with the part from $-\infty$ to $a$ cut off`),
+          tag(['I31'], 'area up to $b$ minus area up to $a$'),
+        ],
       },
       {
         eq: R`\Pr(X=x)=0`,
@@ -268,9 +282,9 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`\Pr(x<X\le x+\delta x)\approx p(x)\,\delta x`,
+        eq: R`\Pr(x<X\le x+\delta x)=\int_x^{x+\delta x}p(t)\,\mathrm dt\approx p(x)\int_x^{x+\delta x}\mathrm dt=p(x)\,\delta x`,
         notes: [
-          lab(R`the green strip: height $p(x)$ times width $\delta x$`),
+          lab(R`the green strip: on a very narrow strip the density is almost constant, equal to $p(x)$, so the area is height $p(x)$ times width $\delta x$ (the integral of 1 over the strip is its width)`),
           lab('a density is probability per unit of $x$'),
         ],
       },
@@ -315,13 +329,20 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`p(\mu)=\frac{1}{\sqrt{2\pi}\,\sigma}:\qquad\sigma=1\Rightarrow0.399,\qquad\sigma=0.5\Rightarrow0.798`,
+        eq: R`p(\mu)=\frac{1}{\sqrt{2\pi}\,\sigma}\exp\!\Big[-\frac{0^2}{2\sigma^2}\Big]=\frac{1}{\sqrt{2\pi}\,\sigma}\cdot e^{0}=\frac{1}{\sqrt{2\pi}\,\sigma}`,
         notes: [
-          ex(R`these are the peak heights in the figure (about $0.4$ and $0.8$)`),
+          ex(R`set $y=\mu$, so $(y-\mu)^2=0$ and the exponential is $e^0=1$: the peak height is the prefactor alone`),
         ],
       },
       {
-        eq: R`\sigma=0.1\ \Rightarrow\ p(\mu)=\frac{1}{\sqrt{2\pi}\times0.1}\simeq3.99>1`,
+        eq: R`\sqrt{2\pi}=\sqrt{6.2832}\approx2.5066:\qquad\sigma=1\Rightarrow\frac{1}{2.5066}\approx0.399,\qquad\sigma=0.5\Rightarrow\frac{1}{2.5066\times0.5}=\frac{1}{1.2533}\approx0.798`,
+        notes: [
+          ex(R`these are the peak heights in the figure (about $0.4$ and $0.8$)`),
+          lab(R`halving $\sigma$ doubles the height, since $\sigma$ is in the denominator`),
+        ],
+      },
+      {
+        eq: R`\sigma=0.1\ \Rightarrow\ p(\mu)=\frac{1}{2.5066\times0.1}=\frac{1}{0.25066}\simeq3.99>1`,
         notes: [ex('a narrow Gaussian has density above 1: the slide 14 point again')],
       },
     ],

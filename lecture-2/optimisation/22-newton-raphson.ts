@@ -51,14 +51,21 @@ const sections: Section[] = [
         notes: [lab('step-size selection: how large a step?')],
       },
       {
-        eq: R`L=\tfrac12(w_1^2+k\,w_2^2):\qquad w_{1,t+1}=(1-\eta)w_{1,t},\qquad w_{2,t+1}=(1-k\eta)w_{2,t}`,
+        eq: R`L=\tfrac12(w_1^2+k\,w_2^2):\qquad w_{1,t+1}=w_{1,t}-\eta\,w_{1,t}=(1-\eta)w_{1,t},\qquad w_{2,t+1}=w_{2,t}-\eta\,k\,w_{2,t}=(1-k\eta)w_{2,t}`,
         notes: [
           lab(R`$k$ is the curvature ratio; a narrow valley has large $k$`),
+          ex(R`the gradient is $(w_1,\,k\,w_2)^\top$, so each coordinate of $\mathbf w_t-\eta\nabla L$ is the old value minus $\eta$ times its own gradient entry`),
           tag(['I73'], R`stable only if $|1-k\eta|<1$, i.e. $\eta<2/k$`),
         ],
       },
       {
-        eq: R`k=10,\ \eta=0.15:\quad 1-k\eta=-0.5,\qquad 1-\eta=0.85`,
+        eq: R`|1-k\eta|<1\iff-1<1-k\eta<1\iff0<k\eta<2\iff0<\eta<\frac2k`,
+        notes: [
+          ex(R`subtract 1 from all three parts: $-2<-k\eta<0$; multiply by $-1$ (which flips both inequalities): $0<k\eta<2$; divide by $k>0$`),
+        ],
+      },
+      {
+        eq: R`k=10,\ \eta=0.15:\quad 1-k\eta=1-10(0.15)=1-1.5=-0.5,\qquad 1-\eta=1-0.15=0.85,\qquad \frac2k=0.2`,
         notes: [
           ex(R`$w_2$ flips sign every step (the zig-zag) while $w_1$ keeps $85\%$ of itself per step (slow)`),
           warn(R`raising $\eta$ to speed up $w_1$ makes $w_2$ diverge once $\eta>0.2$`),
@@ -72,7 +79,7 @@ const sections: Section[] = [
     title: 'Curvature in least squares',
     why: R`Least squares is the cleanest example: gradient descent can need many zig-zag steps, yet the loss is exactly quadratic, so a method that uses its curvature lands on the answer in one step. We recall the solution to check this.`,
     slides: [slide('L2', 50, 'Curvature in least squares'), slide('L2', 51, 'Recall: the least-squares solution')],
-    slideNote: R`Slide 50 figure: gradient descent zig-zagging on least-squares contours. Rows 5 and 6 (the Hessian and the one-step Newton check) are added.`,
+    slideNote: R`Slide 50 figure: gradient descent zig-zagging on least-squares contours. The rows deriving the gradient and Hessian, and the one-step Newton check, are added.`,
     derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
@@ -95,6 +102,18 @@ const sections: Section[] = [
         notes: [tag(['I6'], 'the displayed inverse assumes X has full column rank')],
       },
       {
+        eq: R`\nabla L=\nabla(\mathbf y^\top\mathbf y)-2\nabla(\mathbf y^\top X\mathbf w)+\nabla(\mathbf w^\top X^\top X\mathbf w)=\mathbf 0-2X^\top\mathbf y+2X^\top X\mathbf w`,
+        notes: [
+          tag(['I4', 'I5'], R`$\nabla_{\mathbf w}(\mathbf y^\top X\mathbf w)=X^\top\mathbf y$ and $\nabla_{\mathbf w}(\mathbf w^\top A\mathbf w)=2A\mathbf w$ for symmetric $A=X^\top X$ (derived in the matrix least-squares topic)`),
+        ],
+      },
+      {
+        eq: R`H_{jk}=\frac{\partial}{\partial w_k}(\nabla L)_j=\frac{\partial}{\partial w_k}\Big[2(X^\top X\mathbf w)_j-2(X^\top\mathbf y)_j\Big]=2(X^\top X)_{jk}`,
+        notes: [
+          ex(R`$(X^\top X\mathbf w)_j=\sum_k(X^\top X)_{jk}w_k$ has derivative $(X^\top X)_{jk}$ with respect to $w_k$; $(X^\top\mathbf y)_j$ has no $\mathbf w$`),
+        ],
+      },
+      {
         eq: R`\nabla L=2X^\top X\mathbf w-2X^\top\mathbf y,\qquad H=\nabla^2L=2X^\top X`,
         notes: [
           tag(['I4', 'I5', 'I75'], R`differentiate the gradient once more: the Hessian is constant (no $\mathbf w$)`),
@@ -102,10 +121,17 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`\mathbf w_1=\mathbf w_0-(2X^\top X)^{-1}\big(2X^\top X\mathbf w_0-2X^\top\mathbf y\big)=\mathbf w_0-\mathbf w_0+(X^\top X)^{-1}X^\top\mathbf y=\mathbf w^*`,
+        eq: R`\mathbf w_1=\mathbf w_0-(2X^\top X)^{-1}\big(2X^\top X\mathbf w_0-2X^\top\mathbf y\big)=\mathbf w_0-\tfrac12(X^\top X)^{-1}\cdot2\big(X^\top X\mathbf w_0-X^\top\mathbf y\big)`,
         notes: [
           lab('a full Newton step (next sections) from any start lands on the least-squares solution'),
-          tag(['I21', 'I47'], R`distribute the inverse; $(cA)^{-1}=\tfrac1cA^{-1}$`),
+          tag(['I47'], R`$(cA)^{-1}=\tfrac1cA^{-1}$ with $c=2$, and factor the 2 out of the bracket; then $\tfrac12\cdot2=1$`),
+        ],
+      },
+      {
+        eq: R`=\mathbf w_0-(X^\top X)^{-1}X^\top X\,\mathbf w_0+(X^\top X)^{-1}X^\top\mathbf y=\mathbf w_0-I\mathbf w_0+(X^\top X)^{-1}X^\top\mathbf y=\mathbf w^*`,
+        notes: [
+          tag(['I21'], R`distribute $(X^\top X)^{-1}$ over the bracket, so each of the two terms is multiplied by it`),
+          ex(R`$(X^\top X)^{-1}X^\top X=I$, so $\mathbf w_0-\mathbf w_0=\mathbf 0$ and only $(X^\top X)^{-1}X^\top\mathbf y$ is left`),
         ],
       },
     ],
@@ -138,6 +164,14 @@ const sections: Section[] = [
         ],
       },
       {
+        eq: R`a=1.7:\quad L=1.7^2-\log1.7+e^{0.085}=2.89-0.531+1.089=3.448`,
+        notes: [ex(R`$\log1.7=0.5306$ and $e^{1.7/20}=e^{0.085}=1.0887$`)],
+      },
+      {
+        eq: R`L'(1.7)=3.4-\frac{1}{1.7}+\frac{1.0887}{20}=3.4-0.588+0.054=2.866,\qquad L''(1.7)=2+\frac{1}{1.7^2}+\frac{1.0887}{400}=2+0.346+0.003=2.349`,
+        notes: [ex(R`$1/1.7=0.5882$ and $1.7^2=2.89$, so $1/2.89=0.3460$`)],
+      },
+      {
         eq: R`a=1.7:\quad L=3.448,\quad L'=2.866,\quad L''=2.349`,
         notes: [ex(R`the black line on the figure; $L''>0$, so the parabola opens upwards`)],
       },
@@ -168,8 +202,16 @@ const sections: Section[] = [
         notes: [lab('at any point, form the quadratic approximation'), con(R`$L(w_t),L'(w_t),L''(w_t)$ are numbers: constants in $w$`)],
       },
       {
-        eq: R`q_t'(w)=L'(w_t)+(w-w_t)L''(w_t)=0`,
-        notes: [lab('stationary condition for the quadratic model'), tag(['I14'], 'derivative zero at the minimum')],
+        eq: R`q_t'(w)=0+L'(w_t)+\tfrac12\cdot2(w-w_t)L''(w_t)=L'(w_t)+(w-w_t)L''(w_t)=0`,
+        notes: [
+          lab('stationary condition for the quadratic model'),
+          tag(['I14'], 'derivative zero at the minimum'),
+          tag(['I15'], R`chain rule: $\frac{d}{dw}(w-w_t)^2=2(w-w_t)$; the constants $L(w_t),L'(w_t),L''(w_t)$ differentiate as constants`),
+        ],
+      },
+      {
+        eq: R`(w-w_t)\,L''(w_t)=-L'(w_t)\ \Rightarrow\ w-w_t=-\frac{L'(w_t)}{L''(w_t)}\ \Rightarrow\ w=w_t-\frac{L'(w_t)}{L''(w_t)}`,
+        notes: [ex(R`move $L'(w_t)$ to the right, divide by $L''(w_t)$ (needs $L''\ne0$), then add $w_t$`)],
       },
       {
         eq: R`w_{t+1}=w_t-\frac{L'(w_t)}{L''(w_t)}`,
@@ -178,6 +220,10 @@ const sections: Section[] = [
           lab('take the stationary point of this quadratic model'),
           warn(R`it is a minimum only if $L''(w_t)>0$; check convergence and whether the loss decreases`),
         ],
+      },
+      {
+        eq: R`w_1=1.7-\frac{2.866}{2.349}=1.7-1.220=0.480,\qquad w_2=0.480-\frac{-1.074}{6.349}=0.480+0.169=0.649`,
+        notes: [ex(R`apply the Newton step twice with the derivative values in the table below; subtracting a negative slope over a positive curvature moves $w$ to the right`)],
       },
       {
         eq: R`\begin{array}{c|cccc} t & w_t & L'(w_t) & L''(w_t) & w_{t+1}\\ \hline 0 & 1.700 & 2.866 & 2.349 & 0.480\\ 1 & 0.480 & -1.074 & 6.349 & 0.649\\ 2 & 0.649 & -0.192 & 4.378 & 0.693\\ 3 & 0.693 & -0.007 & 4.087 & 0.694\end{array}`,
@@ -233,12 +279,24 @@ const sections: Section[] = [
         notes: [lab('at any point, form the quadratic approximation')],
       },
       {
+        eq: R`\nabla_{\mathbf d}q_t=\mathbf 0+\nabla L(\mathbf w_t)+\tfrac12\cdot2H_t\mathbf d=\nabla L(\mathbf w_t)+H_t\mathbf d`,
+        notes: [
+          tag(['I4'], R`$\nabla_{\mathbf d}(\mathbf d^\top\mathbf g)=\mathbf g$ with $\mathbf g=\nabla L(\mathbf w_t)$ (a constant vector)`),
+          tag(['I5'], R`$\nabla_{\mathbf d}(\tfrac12\mathbf d^\top H_t\mathbf d)=H_t\mathbf d$ for the symmetric Hessian; $L(\mathbf w_t)$ is a constant`),
+          shape(R`(D+1)\times1`),
+        ],
+      },
+      {
         eq: R`\nabla q_t(\mathbf w)=\mathbf 0\ \Longrightarrow\ H_t\mathbf d=-\nabla L(\mathbf w_t)`,
         notes: [
           lab('stationary condition for the quadratic model'),
           tag(['I75'], R`$\nabla_{\mathbf d}q_t=\nabla L(\mathbf w_t)+H_t\mathbf d$`),
           shape(R`\big((D+1)\times(D+1)\big)\big((D+1)\times1\big)=(D+1)\times1`),
         ],
+      },
+      {
+        eq: R`H_t^{-1}H_t\mathbf d=-H_t^{-1}\nabla L(\mathbf w_t)\ \Rightarrow\ \mathbf d=-H_t^{-1}\nabla L(\mathbf w_t)\ \Rightarrow\ \mathbf w_{t+1}=\mathbf w_t+\mathbf d`,
+        notes: [ex(R`multiply both sides on the LEFT by $H_t^{-1}$ (needs $H_t$ invertible); the step $\mathbf d=\mathbf w-\mathbf w_t$ is added to the current point`)],
       },
       {
         eq: R`\mathbf w_{t+1}=\mathbf w_t-H_t^{-1}\nabla L(\mathbf w_t)`,
@@ -253,7 +311,7 @@ const sections: Section[] = [
         notes: [lab(R`the Hessian inverse replaces the single number $\eta$ by a matrix: a different step size for every direction`)],
       },
       {
-        eq: R`L=\tfrac12(w_1^2+2w_2^2):\quad H=\begin{bmatrix}1&0\\0&2\end{bmatrix},\quad H^{-1}\nabla L=\begin{bmatrix}1&0\\0&\tfrac12\end{bmatrix}\begin{bmatrix}w_1\\2w_2\end{bmatrix}=\begin{bmatrix}w_1\\w_2\end{bmatrix}`,
+        eq: R`L=\tfrac12(w_1^2+2w_2^2):\quad H=\begin{bmatrix}\partial_{11}L&\partial_{12}L\\\partial_{21}L&\partial_{22}L\end{bmatrix}=\begin{bmatrix}1&0\\0&2\end{bmatrix},\quad H^{-1}\nabla L=\begin{bmatrix}1&0\\0&\tfrac12\end{bmatrix}\begin{bmatrix}w_1\\2w_2\end{bmatrix}=\begin{bmatrix}1\cdot w_1+0\cdot2w_2\\0\cdot w_1+\tfrac12\cdot2w_2\end{bmatrix}=\begin{bmatrix}w_1\\w_2\end{bmatrix}`,
         notes: [
           tag(['I41'], 'the inverse of a diagonal matrix inverts each diagonal entry'),
           ex(R`so $\mathbf w_1=\mathbf w_0-\mathbf w_0=\mathbf 0$: one step to the minimum, from anywhere`),
@@ -316,7 +374,7 @@ const sections: Section[] = [
       slide('L2', 148, 'Summation- and matrix-based expressions'),
       slide('L2', 149, 'Newton for logistic regression gives IRLS'),
     ],
-    slideNote: R`Slide 145 lists the appendix (reading: Murphy §10.2.6, iteratively reweighted least squares). Rows 8 to 10 spell out the algebra between the two lines of slide 149.`,
+    slideNote: R`Slide 145 lists the appendix (reading: Murphy §10.2.6, iteratively reweighted least squares). The rows after the Newton step spell out, step by step, the algebra between the two lines of slide 149.`,
     derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
@@ -340,6 +398,20 @@ const sections: Section[] = [
         ],
       },
       {
+        eq: R`(X^\top RX)_{kj}=\sum_{i=1}^{N}\sum_{l=1}^{N}X_{ik}R_{il}X_{lj}=\sum_{i=1}^{N}X_{ik}R_{ii}X_{ij}=\sum_{i=1}^{N}x_{ik}\,p_i(1-p_i)\,x_{ij}`,
+        notes: [
+          tag(['I77'], R`$R$ is diagonal, so $R_{il}=0$ unless $l=i$ and the double sum collapses to one sum`),
+          ex(R`this matches the entry-wise Hessian above, so $H=X^\top RX$`),
+        ],
+      },
+      {
+        eq: R`p_i(1-p_i)=\tfrac14-\big(p_i-\tfrac12\big)^2\le\tfrac14,\qquad \mathbf v^\top X^\top RX\mathbf v=(X\mathbf v)^\top R(X\mathbf v)=\sum_{i=1}^{N}R_{ii}(\mathbf x_i^\top\mathbf v)^2`,
+        notes: [
+          ex(R`expand $\tfrac14-(p-\tfrac12)^2=\tfrac14-p^2+p-\tfrac14=p-p^2$; the largest value $\tfrac14$ is at $p=\tfrac12$`),
+          ex(R`$(X\mathbf v)_i=\mathbf x_i^\top\mathbf v$, and $\mathbf a^\top R\mathbf a=\sum_iR_{ii}a_i^2$ for a diagonal $R$`),
+        ],
+      },
+      {
         eq: R`0<R_{ii}=p_i(1-p_i)\le\tfrac14\ \Rightarrow\ \mathbf v^\top H\mathbf v=\sum_iR_{ii}(\mathbf x_i^\top\mathbf v)^2\ge0`,
         notes: [
           tag(['I77', 'I69'], 'the Hessian is positive semi-definite everywhere'),
@@ -355,19 +427,40 @@ const sections: Section[] = [
         notes: [lab(R`substitute $\nabla L=X^\top(\mathbf p-\mathbf y)$ and $H=X^\top RX$ into the Newton step`)],
       },
       {
-        eq: R`(X^\top RX)\,\mathbf w_{t+1}=X^\top RX\,\mathbf w_t+X^\top(\mathbf y-\mathbf p)`,
-        notes: [lab(R`multiply both sides on the left by $X^\top RX$; the minus sign flips $\mathbf p-\mathbf y$`)],
+        eq: R`(X^\top RX)\,\mathbf w_{t+1}=(X^\top RX)\,\mathbf w_t-(X^\top RX)(X^\top RX)^{-1}X^\top(\mathbf p-\mathbf y)=X^\top RX\,\mathbf w_t+X^\top(\mathbf y-\mathbf p)`,
+        notes: [
+          lab(R`multiply both sides on the left by $X^\top RX$; on the last term $(X^\top RX)(X^\top RX)^{-1}=I$, and the minus sign flips $\mathbf p-\mathbf y$ into $\mathbf y-\mathbf p$`),
+        ],
       },
       {
-        eq: R`=X^\top R\big[X\mathbf w_t+R^{-1}(\mathbf y-\mathbf p)\big]`,
+        eq: R`X^\top(\mathbf y-\mathbf p)=X^\top R\,R^{-1}(\mathbf y-\mathbf p)`,
         notes: [
-          tag(['I21', 'I41'], R`write $X^\top=X^\top RR^{-1}$ in the second term, then factor $X^\top R$ out on the left`),
+          tag(['I41'], R`insert $RR^{-1}=I$ (the inverse of a diagonal matrix inverts each diagonal entry)`),
           warn(R`needs every $R_{ii}>0$, true because $0<p_i<1$`),
+        ],
+      },
+      {
+        eq: R`(X^\top RX)\,\mathbf w_{t+1}=X^\top RX\,\mathbf w_t+X^\top R\,R^{-1}(\mathbf y-\mathbf p)=X^\top R\big[X\mathbf w_t+R^{-1}(\mathbf y-\mathbf p)\big]`,
+        notes: [
+          tag(['I21'], R`factor $X^\top R$ out on the LEFT of both terms`),
         ],
       },
       {
         eq: R`\mathbf u=X\mathbf w_t+R^{-1}(\mathbf y-\mathbf p)\qquad\Rightarrow\qquad(X^\top RX)\,\mathbf w_{t+1}=X^\top R\,\mathbf u`,
         notes: [term('Working response'), shape(R`\mathbf u:\ N\times1;\quad u_i=z_i+\frac{y_i-p_i}{p_i(1-p_i)}`)],
+      },
+      {
+        eq: R`\tfrac12(\mathbf u-X\mathbf w)^\top R(\mathbf u-X\mathbf w)=\tfrac12\mathbf u^\top R\mathbf u-\mathbf u^\top RX\mathbf w+\tfrac12\mathbf w^\top X^\top RX\mathbf w`,
+        notes: [
+          ex(R`multiply out as for ordinary least squares, with $R$ kept in the middle; the two cross terms are equal scalars because $R$ is symmetric, so they combine to $-\mathbf u^\top RX\mathbf w$`),
+        ],
+      },
+      {
+        eq: R`\nabla_{\mathbf w}=\mathbf 0-X^\top R\mathbf u+X^\top RX\mathbf w=\mathbf 0\ \Rightarrow\ X^\top RX\,\mathbf w=X^\top R\,\mathbf u`,
+        notes: [
+          tag(['I4', 'I5'], R`$\nabla_{\mathbf w}(\mathbf a^\top\mathbf w)=\mathbf a$ with $\mathbf a=(\mathbf u^\top RX)^\top=X^\top R\mathbf u$; and $\nabla_{\mathbf w}(\tfrac12\mathbf w^\top A\mathbf w)=A\mathbf w$ with the symmetric $A=X^\top RX$`),
+          lab(R`this is exactly the update equation above, so $\mathbf w_{t+1}$ is the minimiser`),
+        ],
       },
       {
         eq: R`\mathbf w_{t+1}=\arg\min_{\mathbf w}\tfrac12(\mathbf u-X\mathbf w)^\top R\,(\mathbf u-X\mathbf w)`,

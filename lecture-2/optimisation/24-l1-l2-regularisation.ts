@@ -12,7 +12,7 @@ const sections: Section[] = [
     derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
-        eq: R`\Omega_2(\mathbf w)=\frac\lambda2\sum_{j=1}^{D}w_j^2,\qquad\frac{\partial\Omega_2}{\partial w_j}=\lambda w_j`,
+        eq: R`\Omega_2(\mathbf w)=\frac\lambda2\sum_{j=1}^{D}w_j^2,\qquad\frac{\partial\Omega_2}{\partial w_j}=\frac\lambda2\cdot2w_j=\lambda w_j`,
         notes: [
           term('Squared L2 penalty'),
           lab('excluding the intercept (the sum starts at j = 1)'),
@@ -21,18 +21,18 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`w_{t+1,j}=(1-\eta\lambda)\,w_{t,j},\qquad0<\eta\lambda<1`,
-        notes: [lab('considering the penalty alone')],
+        eq: R`w_{t+1,j}=w_{t,j}-\eta\,\lambda w_{t,j}=(1-\eta\lambda)\,w_{t,j},\qquad0<\eta\lambda<1`,
+        notes: [lab('considering the penalty alone'), ex(R`take the gradient step with the penalty gradient $\lambda w_j$ only, then factor out $w_{t,j}$`)],
       },
       {
-        eq: R`w_{t,j}=(1-\eta\lambda)^t\,w_{0,j}\ \ne0\ \ \text{for every }t\ \ (w_{0,j}\ne0)`,
+        eq: R`w_{1,j}=(1-\eta\lambda)w_{0,j},\ \ w_{2,j}=(1-\eta\lambda)^2w_{0,j},\ \dots\ \Rightarrow\ w_{t,j}=(1-\eta\lambda)^t\,w_{0,j}\ \ne0\ \ \text{for every }t\ \ (w_{0,j}\ne0)`,
         notes: [
           tag(['I73'], 'a geometric sequence with 0 < r < 1 shrinks but never reaches 0'),
           lab('L2 typically shrinks coefficients without setting them to zero'),
         ],
       },
       {
-        eq: R`\eta\lambda=0.1,\ w_0=1:\quad 0.9,\ 0.81,\ 0.729,\ \dots,\ w_{20}=0.12,\ w_{50}=0.005`,
+        eq: R`\eta\lambda=0.1,\ w_0=1:\quad 1-0.1=0.9,\ \ 0.9^2=0.81,\ \ 0.9^3=0.729,\ \dots,\ w_{20}=0.9^{20}=0.12,\ w_{50}=0.9^{50}=0.005`,
         notes: [ex('smaller and smaller steps, never exactly 0')],
       },
       {
@@ -64,7 +64,7 @@ const sections: Section[] = [
         notes: [term('L1 norm'), tag(['I50'], 'add the sizes of the coordinates, ignoring signs')],
       },
       {
-        eq: R`\mathbf w_{1:D}=(0.5,\,-2,\,0)^\top:\quad\lVert\cdot\rVert_1=2.5,\qquad\lVert\cdot\rVert_2^2=4.25`,
+        eq: R`\mathbf w_{1:D}=(0.5,\,-2,\,0)^\top:\quad\lVert\cdot\rVert_1=|0.5|+|-2|+|0|=2.5,\qquad\lVert\cdot\rVert_2^2=0.5^2+(-2)^2+0^2=0.25+4+0=4.25`,
         notes: [ex('the L1 penalty grows linearly with each coefficient, the squared L2 penalty quadratically')],
       },
       {
@@ -83,7 +83,7 @@ const sections: Section[] = [
     derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
-        eq: R`\frac{\mathrm d}{\mathrm dw_j}\big[\lambda|w_j|\big]=\lambda\,\operatorname{sign}(w_j),\qquad w_j\ne0`,
+        eq: R`|w_j|=\begin{cases}w_j & w_j>0\\ -w_j & w_j<0\end{cases}\ \Rightarrow\ \frac{\mathrm d}{\mathrm dw_j}\big[\lambda|w_j|\big]=\begin{cases}\lambda\cdot(+1) & w_j>0\\ \lambda\cdot(-1) & w_j<0\end{cases}=\lambda\,\operatorname{sign}(w_j),\qquad w_j\ne0`,
         notes: [
           tag(['I52'], 'the slope of |w| is ±1 however small w is'),
           lab('the L1 penalty has a gradient of constant magnitude away from zero'),
@@ -96,9 +96,9 @@ const sections: Section[] = [
         notes: [lab('considering the penalty alone: a fixed-size step towards 0')],
       },
       {
-        eq: R`\eta\lambda=0.1,\ w_0=1:\quad0.9,\ 0.8,\ \dots,\ 0.1,\ 0\quad(\text{10 steps})`,
+        eq: R`\eta\lambda=0.1,\ w_0=1:\quad1-0.1=0.9,\ 0.9-0.1=0.8,\ \dots,\ 0.1,\ 0\quad(\text{10 steps})`,
         notes: [
-          ex('compare L2 with the same ηλ: still 0.35 after 10 steps, never 0'),
+          ex(R`compare L2 with the same $\eta\lambda$: $0.9^{10}=0.349$, so still about $0.35$ after 10 steps, never 0`),
           lab('practical LASSO solvers stop the coefficient at 0 instead of stepping past it'),
         ],
       },
@@ -155,7 +155,7 @@ const sections: Section[] = [
         notes: [],
       },
       {
-        eq: R`\mathbf w=(0.6,0.4):\ \lVert\mathbf w\rVert_1=1,\ \lVert\mathbf w\rVert_2=0.72;\qquad\mathbf w=(0.71,0.71):\ \lVert\mathbf w\rVert_2=1,\ \lVert\mathbf w\rVert_1=1.41`,
+        eq: R`\mathbf w=(0.6,0.4):\ \lVert\mathbf w\rVert_1=0.6+0.4=1,\ \lVert\mathbf w\rVert_2=\sqrt{0.36+0.16}=\sqrt{0.52}=0.72;\qquad\mathbf w=(0.71,0.71):\ \lVert\mathbf w\rVert_2=\sqrt{0.5041+0.5041}\approx1,\ \lVert\mathbf w\rVert_1=0.71+0.71=1.42`,
         notes: [ex('the first is on the diamond (inside the circle); the second on the circle (outside the diamond)')],
       },
     ],
@@ -177,14 +177,15 @@ const sections: Section[] = [
         eq: R`\Pi_{\lVert\cdot\rVert_2\le r}(\mathbf v)=r\,\frac{\mathbf v}{\lVert\mathbf v\rVert_2}\quad(\lVert\mathbf v\rVert_2>r)`,
         notes: [
           tag(['I54'], 'scale the point back along the line to the centre: every nonzero coordinate stays nonzero'),
-          ex(R`$r=1$, $\mathbf v=(3,4)$: $\Pi=(0.6,0.8)$, both nonzero`),
+          ex(R`$r=1$, $\mathbf v=(3,4)$: $\lVert\mathbf v\rVert_2=\sqrt{9+16}=5$, so $\Pi=1\cdot\frac{1}{5}(3,4)=(0.6,0.8)$, both nonzero`),
         ],
       },
       {
         eq: R`r=1,\ \mathbf v=(0.2,\,3):\quad\Pi_{\lVert\cdot\rVert_1\le1}(\mathbf v)=(0,\,1)`,
         notes: [
           ex('a point in the red wedge lands on the top corner: the first coordinate becomes exactly 0'),
-          lab(R`in contrast, the L2 projection of the same point is $(0.067,\,0.998)$: small, but not 0`),
+          ex(R`why: moving $\mathbf v$ straight onto the edge $w_1+w_2=1$ subtracts $\frac{0.2+3-1}{2}=1.1$ from each coordinate, giving $(-0.9,\,1.9)$, whose first coordinate is negative, so that point is off the diamond edge; the nearest point of the diamond is the corner $(0,1)$`),
+          lab(R`in contrast, the L2 projection of the same point is $\frac{(0.2,3)}{\sqrt{0.04+9}}=\frac{(0.2,3)}{3.007}=(0.067,\,0.998)$: small, but not 0`),
         ],
       },
     ],

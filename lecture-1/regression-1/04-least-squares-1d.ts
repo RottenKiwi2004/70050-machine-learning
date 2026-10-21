@@ -235,7 +235,7 @@ const sections: Section[] = [
     title: 'Differentiating through the residual',
     why: R`$L$ depends on $w_0$ and $w_1$ only through the residuals. Differentiating each residual first (trivial: it is linear) and then using the chain rule gives both partial derivatives of $L$ without expanding any squares.`,
     slides: [slide('I', 37, 'Differentiating through the residual')],
-    slideNote: R`Row 3 (derivative of a sum) is added. Rows 6 and 7 are added: the slide works only $w_0$, and the $w_1$ result appears on slide 38.`,
+    slideNote: R`The derivative of a sum row is added, and so are the two rows differentiating $\epsilon_i$ step by step. The $w_1$ rows are added: the slide works only $w_0$, and the $w_1$ result appears on slide 38.`,
     derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
@@ -243,10 +243,16 @@ const sections: Section[] = [
         notes: [lab(R`$L$ is RSS; $\epsilon_i$ is residual $i$`), shape(R`\text{all }1\times1`)],
       },
       {
-        eq: R`\frac{\partial\epsilon_i}{\partial w_0}=-1,\qquad \frac{\partial\epsilon_i}{\partial w_1}=-x_i`,
+        eq: R`\frac{\partial\epsilon_i}{\partial w_0}=\frac{\partial y_i}{\partial w_0}-\frac{\partial w_0}{\partial w_0}-\frac{\partial (w_1x_i)}{\partial w_0}=0-1-0=-1`,
         notes: [
           con(R`$y_i$ and $x_i$ are data: constants with respect to $\mathbf w$, so they differentiate to 0 or stay as factors`),
-          lab(R`$\partial$ differentiates one coefficient, holding the other fixed`),
+          lab(R`$\partial$ differentiates one coefficient, holding the other fixed: $w_1x_i$ does not contain $w_0$, so it counts as a constant`),
+        ],
+      },
+      {
+        eq: R`\frac{\partial\epsilon_i}{\partial w_1}=\frac{\partial y_i}{\partial w_1}-\frac{\partial w_0}{\partial w_1}-\frac{\partial (w_1x_i)}{\partial w_1}=0-0-x_i=-x_i`,
+        notes: [
+          lab(R`$w_0$ now counts as a constant; $\partial(w_1x_i)/\partial w_1=x_i$ because $x_i$ is a constant factor`),
         ],
       },
       {
@@ -301,28 +307,50 @@ const sections: Section[] = [
     title: 'Rearrange',
     why: R`The conditions are tangled sums. Splitting them and pulling the unknowns out front shows they are just two linear equations in $w_0$ and $w_1$, whose coefficients are sums we can compute from the data.`,
     slides: [slide('I', 38, 'Fitting a line: stationary conditions')],
-    slideNote: 'Rows 1 and 3 are added to show the steps; rows 2 and 4 are the slide.',
+    slideNote: 'Rows 1 to 3 and 5 to 8 are added to show every step of the splitting; rows 4 and 9 are the slide.',
     derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
-        eq: R`\text{(a)}\div(-2):\quad\sum_i y_i-\sum_i w_0-\sum_i w_1x_i=0\ \Rightarrow\ \sum_i y_i-Nw_0-w_1\sum_i x_i=0`,
+        eq: R`\text{(a)}:\quad -2\sum_{i=1}^{N}(y_i-w_0-w_1x_i)=0\ \Rightarrow\ \sum_{i=1}^{N}(y_i-w_0-w_1x_i)=0`,
         notes: [
-          ex('divide by $-2$, which is allowed because $-2$ is not zero'),
-          tag(['I16'], R`split the sum; $\sum_{i=1}^N w_0=Nw_0$; $w_1$ comes out`),
+          ex('divide both sides by $-2$, which is allowed because $-2$ is not zero (and $0/(-2)=0$)'),
+        ],
+      },
+      {
+        eq: R`\sum_{i=1}^{N}y_i-\sum_{i=1}^{N}w_0-\sum_{i=1}^{N}w_1x_i=0`,
+        notes: [
+          tag(['I16'], R`split the sum of three terms into three sums`),
+        ],
+      },
+      {
+        eq: R`\sum_{i=1}^{N}y_i-Nw_0-w_1\sum_{i=1}^{N}x_i=0`,
+        notes: [
+          tag(['I16'], R`$\sum_{i=1}^N w_0=w_0+\dots+w_0=Nw_0$ ($N$ copies); $w_1$ comes out of the third sum`),
           con(R`$w_0,w_1$ do not depend on $i$: constants inside the sum`),
         ],
       },
       {
         eq: R`Nw_0+w_1\sum_i x_i=\sum_i y_i`,
-        notes: [ex('move the unknowns to the left')],
+        notes: [ex(R`add $Nw_0+w_1\sum_ix_i$ to both sides: the unknowns move to the left, the data sum to the right`)],
       },
       {
-        eq: R`\text{(b)}\div(-2):\quad\sum_i x_iy_i-w_0\sum_i x_i-w_1\sum_i x_i^2=0`,
-        notes: [tag(['I16'], R`multiply $x_i$ into the bracket, split, pull out $w_0$ and $w_1$`)],
+        eq: R`\text{(b)}:\quad \sum_{i=1}^{N}x_i(y_i-w_0-w_1x_i)=0\ \ (\text{after dividing by }-2)`,
+        notes: [ex('same division by $-2$ as for (a)')],
+      },
+      {
+        eq: R`x_i(y_i-w_0-w_1x_i)=x_iy_i-w_0x_i-w_1x_i^2\ \Rightarrow\ \sum_i x_iy_i-\sum_i w_0x_i-\sum_i w_1x_i^2=0`,
+        notes: [
+          ex(R`multiply $x_i$ into the bracket term by term: $x_i\cdot y_i$, $x_i\cdot w_0$, $x_i\cdot w_1x_i=w_1x_i^2$`),
+          tag(['I16'], R`split the sum into three sums`),
+        ],
+      },
+      {
+        eq: R`\sum_i x_iy_i-w_0\sum_i x_i-w_1\sum_i x_i^2=0`,
+        notes: [tag(['I16'], R`pull the constants $w_0$ and $w_1$ out of their sums`)],
       },
       {
         eq: R`w_0\sum_i x_i+w_1\sum_i x_i^2=\sum_i x_iy_i`,
-        notes: [ex('move the unknowns to the left'), shape(R`\text{both equations: }1\times1`)],
+        notes: [ex(R`add $w_0\sum_ix_i+w_1\sum_ix_i^2$ to both sides`), shape(R`\text{both equations: }1\times1`)],
       },
     ],
   },
@@ -356,7 +384,7 @@ const sections: Section[] = [
     title: 'Matrix form of the normal equations',
     why: R`Building $X$ with a column of 1s and a column of inputs turns the $2\times2$ system into $X^\top X\mathbf w=X^\top\mathbf y$. That form does not care how many columns $X$ has, so the same formula works for any number of inputs.`,
     slides: [slide('I', 39, 'Matrix form of the normal equations')],
-    slideNote: R`Rows 2 and 3 are added: they multiply out $X^\top X$ and $X^\top\mathbf y$ to show they are the matrix and right-hand side of slide 38. The slide writes row 4 as $X^\top\mathbf y=X^\top X\mathbf w$. The slide attaches the label "Normal Equation" to the boxed $\hat{\mathbf w}$ (row 5).`,
+    slideNote: R`Rows 2 to 9 are added: they write $X^\top$ out and multiply out $X^\top X$ and $X^\top\mathbf y$ entry by entry, to show they are the matrix and right-hand side of slide 38. The slide writes the normal equation as $X^\top\mathbf y=X^\top X\mathbf w$. The slide attaches the label "Normal Equation" to the boxed $\hat{\mathbf w}$ (last row), and the step with $I$ is added.`,
     derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
@@ -368,7 +396,25 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`X^\top X=\begin{bmatrix}\sum_i 1\cdot1 & \sum_i 1\cdot x_i\\ \sum_i x_i\cdot1 & \sum_i x_i\cdot x_i\end{bmatrix}=\begin{bmatrix}N & \sum_i x_i\\ \sum_i x_i & \sum_i x_i^2\end{bmatrix}`,
+        eq: R`X^\top=\begin{bmatrix}1 & 1 & \cdots & 1\\ x_1 & x_2 & \cdots & x_N\end{bmatrix}`,
+        notes: [
+          lab(R`transposing swaps rows and columns: the column of 1s becomes the first row, the column of $x_i$ becomes the second row`),
+          shape(R`X:\ N\times2\ \Rightarrow\ X^\top:\ 2\times N`),
+        ],
+      },
+      {
+        eq: R`X^\top X=\begin{bmatrix}1 & \cdots & 1\\ x_1 & \cdots & x_N\end{bmatrix}\begin{bmatrix}1 & x_1\\ \vdots & \vdots\\ 1 & x_N\end{bmatrix}`,
+        notes: [
+          lab(R`entry $(j,k)$ is row $j$ of $X^\top$ times column $k$ of $X$: the dot product of two length-$N$ vectors`),
+          shape(R`(2\times N)(N\times2)=2\times2`),
+        ],
+      },
+      {
+        eq: R`=\begin{bmatrix}1\cdot1+\dots+1\cdot1 & 1\cdot x_1+\dots+1\cdot x_N\\ x_1\cdot1+\dots+x_N\cdot1 & x_1\cdot x_1+\dots+x_N\cdot x_N\end{bmatrix}`,
+        notes: [lab(R`the four dot products written out term by term`)],
+      },
+      {
+        eq: R`=\begin{bmatrix}\sum_i 1\cdot1 & \sum_i 1\cdot x_i\\ \sum_i x_i\cdot1 & \sum_i x_i\cdot x_i\end{bmatrix}=\begin{bmatrix}N & \sum_i x_i\\ \sum_i x_i & \sum_i x_i^2\end{bmatrix}`,
         notes: [
           tag(['I17'], R`entry $(j,k)$ is column $j$ of $X$ dotted with column $k$`),
           tag(['I16'], R`$\sum_{i=1}^N 1=N$`),
@@ -376,7 +422,14 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`X^\top\mathbf y=\begin{bmatrix}\sum_i 1\cdot y_i\\ \sum_i x_i\,y_i\end{bmatrix}=\begin{bmatrix}\sum_i y_i\\ \sum_i x_iy_i\end{bmatrix}`,
+        eq: R`X^\top\mathbf y=\begin{bmatrix}1 & \cdots & 1\\ x_1 & \cdots & x_N\end{bmatrix}\begin{bmatrix}y_1\\ \vdots\\ y_N\end{bmatrix}=\begin{bmatrix}1\cdot y_1+\dots+1\cdot y_N\\ x_1y_1+\dots+x_Ny_N\end{bmatrix}`,
+        notes: [
+          lab(R`first entry: row 1 of $X^\top$ dotted with $\mathbf y$; second entry: row 2 dotted with $\mathbf y$`),
+          shape(R`(2\times N)(N\times1)=2\times1`),
+        ],
+      },
+      {
+        eq: R`=\begin{bmatrix}\sum_i 1\cdot y_i\\ \sum_i x_i\,y_i\end{bmatrix}=\begin{bmatrix}\sum_i y_i\\ \sum_i x_iy_i\end{bmatrix}`,
         notes: [
           tag(['I17'], R`entry $j$ is column $j$ of $X$ dotted with $\mathbf y$`),
           shape(R`X^\top\mathbf y:\ (2\times N)(N\times1)=2\times1`),
@@ -388,6 +441,13 @@ const sections: Section[] = [
           term('Normal Equation'),
           lab(R`rows 2 and 3 are exactly the matrix and right-hand side of the $2\times2$ system`),
           shape(R`(2\times2)(2\times1)=2\times1`),
+        ],
+      },
+      {
+        eq: R`(X^\top X)^{-1}X^\top X\,\mathbf w=(X^\top X)^{-1}X^\top\mathbf y\ \Rightarrow\ I\,\mathbf w=(X^\top X)^{-1}X^\top\mathbf y`,
+        notes: [
+          ex(R`multiply both sides on the left by $(X^\top X)^{-1}$; on the left it meets $X^\top X$ and gives the identity $I$ ($2\times2$)`),
+          tag(['I6'], R`$A^{-1}A=I$ for an invertible square $A$; $I\mathbf w=\mathbf w$`),
         ],
       },
       {

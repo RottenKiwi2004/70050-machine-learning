@@ -74,12 +74,17 @@ const sections: Section[] = [
         notes: [lab('slide 42: t = 0')],
       },
       {
-        eq: R`w_{1,t+1}=(1-\eta)\,w_{1,t},\qquad w_{2,t+1}=(1-2\eta)\,w_{2,t}`,
+        eq: R`w_{1,t+1}=w_{1,t}-\eta\,w_{1,t}=(1-\eta)\,w_{1,t},\qquad w_{2,t+1}=w_{2,t}-\eta\,(2w_{2,t})=(1-2\eta)\,w_{2,t}`,
         notes: [lab('the update, coordinate by coordinate, for a constant rate'), tag(['I73'], 'each coordinate shrinks by its own factor')],
       },
       {
-        eq: R`\eta=0.3:\quad(-2,\,1.8)\to(-1.4,\,0.72)\to(-0.98,\,0.29)\to(-0.69,\,0.12)`,
+        eq: R`L(-2,1.8)=\tfrac12\big((-2)^2+2(1.8)^2\big)=\tfrac12(4+6.48)=5.24,\qquad L(-1.4,0.72)=\tfrac12(1.96+1.037)\approx1.50`,
+        notes: [ex(R`evaluate the loss at the first two iterates: $1.8^2=3.24$, $2\cdot3.24=6.48$; $0.72^2=0.5184$, $2\cdot0.5184=1.0368$`)],
+      },
+      {
+        eq: R`\eta=0.3:\quad 1-\eta=0.7,\quad 1-2\eta=0.4;\qquad(-2,\,1.8)\to(-1.4,\,0.72)\to(-0.98,\,0.29)\to(-0.69,\,0.12)`,
         notes: [
+          ex(R`$w_1$: $-2\cdot0.7=-1.4$, then $-1.4\cdot0.7=-0.98$, then $-0.98\cdot0.7=-0.686$. $w_2$: $1.8\cdot0.4=0.72$, then $0.72\cdot0.4=0.288$, then $0.288\cdot0.4=0.1152$ (rounded in the display)`),
           ex(R`$t=0,1,2,3$ as on slides 42 to 45; the loss goes $5.24\to1.50\to0.56\to0.25$`),
           lab(R`$w_2$ shrinks by $0.4$ per step, $w_1$ only by $0.7$: the path bends towards the flatter $w_1$ axis first`),
         ],
@@ -116,16 +121,19 @@ const sections: Section[] = [
         notes: [lab(R`one scalar parameter $w$; the minimum is at $w=0$`), con(R`$\eta$ is fixed here`)],
       },
       {
-        eq: R`w_t=(1-\eta)^{t}\,w_0`,
-        notes: [tag(['I73'], R`a geometric sequence with ratio $r=1-\eta$`)],
+        eq: R`w_1=r\,w_0,\quad w_2=r\,w_1=r^2w_0,\quad w_3=r\,w_2=r^3w_0,\ \dots\ \Rightarrow\ w_t=(1-\eta)^{t}\,w_0,\qquad r=1-\eta`,
+        notes: [tag(['I73'], R`a geometric sequence with ratio $r=1-\eta$: each step multiplies by $r$ once more`)],
       },
       {
         eq: R`\begin{array}{l|l|l}\eta & r=1-\eta & \text{behaviour}\\ \hline 0<\eta<1 & 0<r<1 & \text{approaches 0 without changing sign}\\ \eta=1 & r=0 & \text{reaches the minimum in one step}\\ 1<\eta<2 & -1<r<0 & \text{alternates signs but still approaches 0}\\ \eta=2 & r=-1 & \text{oscillates }(\pm w_0\text{ forever})\\ \eta>2 & r<-1 & \text{diverges (unless already at 0)}\end{array}`,
         notes: [lab('the five cases on the slide')],
       },
       {
-        eq: R`w_0=2:\quad\eta=0.5:\ 1,\,0.5,\,0.25;\qquad\eta=1.5:\ -1,\,0.5,\,-0.25;\qquad\eta=2.5:\ -3,\,4.5,\,-6.75`,
-        notes: [ex('three steps each')],
+        eq: R`w_0=2:\quad\eta=0.5\ (r=0.5):\ 1,\,0.5,\,0.25;\qquad\eta=1.5\ (r=-0.5):\ -1,\,0.5,\,-0.25;\qquad\eta=2.5\ (r=-1.5):\ -3,\,4.5,\,-6.75`,
+        notes: [
+          ex('three steps each: multiply the previous value by $r$ every time'),
+          lab(R`e.g. $\eta=2.5$: $2\cdot(-1.5)=-3$, then $-3\cdot(-1.5)=4.5$, then $4.5\cdot(-1.5)=-6.75$`),
+        ],
       },
     ],
     callouts: [

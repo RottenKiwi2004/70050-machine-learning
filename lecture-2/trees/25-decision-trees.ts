@@ -42,7 +42,7 @@ const sections: Section[] = [
         notes: [lab('each pair is (yes-label count, no-label count) at a leaf')],
       },
       {
-        eq: R`\hat P(\text{yes}\mid\text{leaf})=\frac{n_{\text{yes}}}{n_{\text{yes}}+n_{\text{no}}}:\qquad\text{Blue }1,\quad\text{Red ellipse }0.5,\quad\text{Red other }0,\quad\text{size}<10\ 1,\quad\text{size}\ge10\ 0`,
+        eq: R`\hat P(\text{yes}\mid\text{leaf})=\frac{n_{\text{yes}}}{n_{\text{yes}}+n_{\text{no}}}:\qquad\text{Blue }\tfrac{4}{4+0}=1,\quad\text{Red ellipse }\tfrac{1}{1+1}=0.5,\quad\text{Red other }\tfrac{0}{0+2}=0,\quad\text{size}<10\ \tfrac{4}{4+0}=1,\quad\text{size}\ge10\ \tfrac{0}{0+5}=0`,
         notes: [lab("predict by the leaf's class frequencies, or choose the majority label")],
       },
       {
@@ -90,8 +90,22 @@ const sections: Section[] = [
         notes: [lab(R`$\mu_j$: the probability of class 1 in that leaf`), tag(['I65'], R`$\mu_j^{y_i}(1-\mu_j)^{1-y_i}$`)],
       },
       {
+        eq: R`C_j(\mu)=-\sum_{i:\mathbf x_i\in\mathcal R_j}\big[y_i\log\mu+(1-y_i)\log(1-\mu)\big]=-n_1\log\mu-n_0\log(1-\mu)`,
+        notes: [
+          tag(['I65', 'I34'], R`negative log-likelihood of the Bernoulli leaf model, as in logistic regression`),
+          lab(R`$n_1$: number of leaf examples with $y_i=1$; $n_0$: number with $y_i=0$; $n=n_0+n_1$`),
+        ],
+      },
+      {
+        eq: R`\frac{\mathrm dC_j}{\mathrm d\mu}=-\frac{n_1}{\mu}+\frac{n_0}{1-\mu}=0\ \Rightarrow\ n_0\mu=n_1(1-\mu)\ \Rightarrow\ (n_0+n_1)\mu=n_1\ \Rightarrow\ \mu=\frac{n_1}{n}`,
+        notes: [
+          tag(['I37'], R`$\frac{d}{d\mu}\log\mu=\frac1\mu$ and $\frac{d}{d\mu}\log(1-\mu)=-\frac{1}{1-\mu}$`),
+          ex(R`multiply both sides by $\mu(1-\mu)>0$ to clear the denominators, then expand and collect the $\mu$ terms`),
+        ],
+      },
+      {
         eq: R`\hat\mu_j=\frac{\#\{i:\mathbf x_i\in\mathcal R_j,\ y_i=1\}}{\#\{i:\mathbf x_i\in\mathcal R_j\}}`,
-        notes: [lab('for a fixed tree the best leaf probability is the class-1 fraction in the leaf (the maximum-likelihood estimate)'), ex(R`leaf with counts $(4,1)$: $\hat\mu_j=0.8$`)],
+        notes: [lab('for a fixed tree the best leaf probability is the class-1 fraction in the leaf (the maximum-likelihood estimate)'), ex(R`leaf with counts $(4,1)$: $\hat\mu_j=\frac{4}{4+1}=0.8$`)],
       },
       {
         eq: R`J(T)=\lambda\,C(T)-\sum_{i=1}^{N}\log p(y_i\mid\mathbf x_i;T)`,
@@ -134,7 +148,7 @@ const sections: Section[] = [
         notes: [
           term('Information content of an outcome'),
           lab('a measure of surprise: predictable events do not provide information'),
-          ex(R`$P=\tfrac12$: 1 bit; $P=\tfrac18$: 3 bits; $P=1$: 0 bits`),
+          ex(R`$P=\tfrac12$: $\log_2 2=1$ bit; $P=\tfrac18$: $\log_2 8=3$ bits; $P=1$: $\log_2 1=0$ bits`),
         ],
       },
       {
@@ -164,7 +178,7 @@ const sections: Section[] = [
         notes: [shape(R`H:\ 1\times1,\ \ 0\le H\le1\ \text{bit}`)],
       },
       {
-        eq: R`p=0.5:\ H=1,\qquad p=0.1:\ H=0.469,\qquad p=0\text{ or }1:\ H=0`,
+        eq: R`p=0.5:\ H=0.5\log_22+0.5\log_22=1,\qquad p=0.1:\ H=0.1\log_210+0.9\log_2\tfrac{1}{0.9}=0.1(3.322)+0.9(0.152)=0.469,\qquad p=0\text{ or }1:\ H=0`,
         notes: [
           lab('p = 0.5: as unpredictable as it gets'),
           lab('p = 0 or p = 1: no information gained by observing'),
@@ -191,11 +205,11 @@ const sections: Section[] = [
         notes: [term('Discrete entropy'), tag(['I80'], R`$-\log p=\log\frac1p$, so this is the same formula as before`)],
       },
       {
-        eq: R`p_c=\tfrac1C:\quad H=-\sum_{c=1}^{C}\tfrac1C\log\tfrac1C=\log C`,
+        eq: R`p_c=\tfrac1C:\quad H=-\sum_{c=1}^{C}\tfrac1C\log\tfrac1C=-C\cdot\tfrac1C\log\tfrac1C=-\log\tfrac1C=\log C`,
         notes: [ex(R`$C=30$: $\ln30=3.40$ nats, above both histograms (1.77 and 3.09)`)],
       },
       {
-        eq: R`H_{\text{bits}}=\frac{H_{\text{nats}}}{\ln2}`,
+        eq: R`H_{\text{bits}}=-\sum_cp_c\log_2p_c=-\sum_cp_c\,\frac{\ln p_c}{\ln2}=\frac{1}{\ln2}\Big(-\sum_cp_c\ln p_c\Big)=\frac{H_{\text{nats}}}{\ln2}`,
         notes: [
           lab('here natural logs give entropy in nats'),
           warn('use the same log base for every term of an information-gain comparison'),
@@ -244,11 +258,11 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`\text{parent }(4,4):\ H=1;\qquad\text{L }(4,1):\ H=0.722,\quad\text{R }(0,3):\ H=0`,
+        eq: R`\text{parent }(4,4):\ H=\tfrac12\log_22+\tfrac12\log_22=1;\quad\text{L }(4,1):\ H=0.8\log_2\tfrac{1}{0.8}+0.2\log_2\tfrac{1}{0.2}=0.8(0.322)+0.2(2.322)=0.722;\quad\text{R }(0,3):\ H=0`,
         notes: [ex('8 examples, 4 of each class; the split sends 5 left and 3 right (counts are (class 1, class 0)), entropy in bits')],
       },
       {
-        eq: R`IG=1-\tfrac58(0.722)-\tfrac38(0)=0.549\ \text{bits}`,
+        eq: R`IG=H(I_n)-\tfrac{|I_{\mathrm L}|}{|I_n|}H(I_{\mathrm L})-\tfrac{|I_{\mathrm R}|}{|I_n|}H(I_{\mathrm R})=1-\tfrac58(0.722)-\tfrac38(0)=1-0.451-0=0.549\ \text{bits}`,
         notes: [ex('a split that sent (2,2) to each side would score IG = 1 − 1 = 0: no information')],
       },
     ],

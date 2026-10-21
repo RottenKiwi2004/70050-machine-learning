@@ -31,10 +31,17 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`z=0\ \iff\ x=\frac{-w_1\pm\sqrt{w_1^2-4w_2w_0}}{2w_2}`,
+        eq: R`z=0\ \iff\ w_2x^2+w_1x+w_0=0\ \iff\ x=\frac{-w_1\pm\sqrt{w_1^2-4w_2w_0}}{2w_2}`,
         notes: [
           lab('back on the x axis the boundary is two thresholds: the class in the middle is between them'),
-          ex(R`$w_0=-1,\ w_1=0,\ w_2=1$: $z=x^2-1$, so $\hat y=1$ for $|x|\ge1$ and $\hat y=0$ for $|x|<1$`),
+          ex(R`rearrange $z=w_0+w_1x+w_2x^2$ as a quadratic in $x$ with coefficients $a=w_2$, $b=w_1$, $c=w_0$, then apply the quadratic formula $x=\frac{-b\pm\sqrt{b^2-4ac}}{2a}$ (needs $w_2\ne0$ and a non-negative discriminant)`),
+        ],
+      },
+      {
+        eq: R`w_0=-1,\ w_1=0,\ w_2=1:\quad z=x^2-1=0\ \Rightarrow\ x^2=1\ \Rightarrow\ x=\pm1;\qquad z\ge0\iff x^2\ge1\iff|x|\ge1`,
+        notes: [
+          ex(R`check with the formula: $x=\frac{-0\pm\sqrt{0-4(1)(-1)}}{2(1)}=\frac{\pm\sqrt4}{2}=\pm1$`),
+          ex(R`so $\hat y=1$ for $|x|\ge1$ and $\hat y=0$ for $|x|<1$`),
         ],
       },
     ],
@@ -61,7 +68,7 @@ const sections: Section[] = [
         notes: [lab('a separating plane in feature space')],
       },
       {
-        eq: R`w_1=w_2=0,\ w_3=1,\ w_0=-r^2:\quad x_1^2+x_2^2=r^2`,
+        eq: R`w_1=w_2=0,\ w_3=1,\ w_0=-r^2:\quad -r^2+0\cdot x_1+0\cdot x_2+1\cdot(x_1^2+x_2^2)=0\ \Rightarrow\ x_1^2+x_2^2=r^2`,
         notes: [
           lab('gives a curved boundary in input space: a circle of radius r'),
           ex(R`$r=1$: $\hat y=1$ (outside) when $x_1^2+x_2^2\ge1$`),

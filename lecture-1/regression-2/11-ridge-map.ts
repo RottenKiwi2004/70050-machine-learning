@@ -150,7 +150,7 @@ const sections: Section[] = [
     title: 'Gaussian likelihood gives least squares',
     why: R`Maximising the likelihood is the probabilistic way to fit $\mathbf w$. Working it through shows that, with Gaussian noise, it gives exactly the least-squares fit we already know. This is the first half of the ridge story; the prior supplies the second half.`,
     slides: [slide('II', 23, 'Gaussian likelihood gives least squares')],
-    slideNote: R`The slide shows only row 5 and row 7. Rows 1 to 4 (product over $i$, log of the product, the per-example term) and row 6 are added so each rule is visible.`,
+    slideNote: R`The slide shows only the norm form and the final least-squares row. The in-between rows (the per-example term, the splitting of the sum, the step to a norm) and the arg min row are added so each rule is visible.`,
     derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
@@ -169,17 +169,35 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`=\sum_{i=1}^{N}\Big[\tfrac12\log(2\pi\sigma^2)+\frac{(y_i-\mathbf x_i^\top\mathbf w)^2}{2\sigma^2}\Big]`,
+        eq: R`-\log p(y_i\mid\mathbf x_i,\mathbf w)=-\log\frac{1}{\sqrt{2\pi\sigma^2}}-\log\exp\!\Big[-\frac{(y_i-\mathbf x_i^\top\mathbf w)^2}{2\sigma^2}\Big]=\tfrac12\log(2\pi\sigma^2)+\frac{(y_i-\mathbf x_i^\top\mathbf w)^2}{2\sigma^2}`,
         notes: [
-          tag(['I44'], R`negative log of each Gaussian factor, with $\mu=\mathbf x_i^\top\mathbf w$`),
-          shape(R`\text{each bracket: }1\times1`),
+          tag(['I44'], R`negative log of each Gaussian factor, with $\mu=\mathbf x_i^\top\mathbf w$: $-\log\frac1{\sqrt c}=\tfrac12\log c$ and $-\log e^{a}=-a$, so the double minus gives a plus`),
+          shape(R`\text{each term: }1\times1`),
         ],
+      },
+      {
+        eq: R`-\log p(\mathbf y\mid X,\mathbf w,\sigma^2)=\sum_{i=1}^{N}\Big[\tfrac12\log(2\pi\sigma^2)+\frac{(y_i-\mathbf x_i^\top\mathbf w)^2}{2\sigma^2}\Big]`,
+        notes: [
+          ex(R`substitute the per-example result into the sum of the previous row`),
+        ],
+      },
+      {
+        eq: R`=\sum_{i=1}^{N}\tfrac12\log(2\pi\sigma^2)+\sum_{i=1}^{N}\frac{(y_i-\mathbf x_i^\top\mathbf w)^2}{2\sigma^2}`,
+        notes: [tag(['I16'], R`split the sum of two terms into two sums`)],
       },
       {
         eq: R`=\htmlClass{c-orange}{\frac N2\log(2\pi\sigma^2)}+\frac{1}{2\sigma^2}\sum_{i=1}^{N}(y_i-\mathbf x_i^\top\mathbf w)^2`,
         notes: [
           lab(R`split the sum: the first term is the same for every $i$, so it appears $N$ times`),
+          tag(['I16'], R`$\sum_{i=1}^N c=Nc$, and the constant $\frac{1}{2\sigma^2}$ comes out of the second sum`),
           con(R`$\frac N2\log(2\pi\sigma^2)$ has no $\mathbf w$: constant`),
+        ],
+      },
+      {
+        eq: R`(X\mathbf w)_i=\sum_{j=1}^{D}X_{ij}w_j=\mathbf x_i^\top\mathbf w\ \Rightarrow\ \sum_{i=1}^{N}(y_i-\mathbf x_i^\top\mathbf w)^2=\sum_{i=1}^{N}\big(y_i-(X\mathbf w)_i\big)^2=\lVert\mathbf y-X\mathbf w\rVert^2`,
+        notes: [
+          ex(R`row $i$ of $X$ is $\mathbf x_i^\top$, so entry $i$ of $X\mathbf w$ is row $i$ times $\mathbf w$; the sum of squares of the entries of $\mathbf y-X\mathbf w$ is its squared norm`),
+          shape(R`\mathbf y-X\mathbf w:\ N\times1`),
         ],
       },
       {
@@ -195,7 +213,7 @@ const sections: Section[] = [
         notes: [tag(['I35'], 'maximising a density is the same as minimising its negative log'), shape(R`\hat{\mathbf w}_{\text{ML}}:\ D\times1`)],
       },
       {
-        eq: R`\hat{\mathbf w}_{\text{ML}}=\arg\min_{\mathbf w}\lVert\mathbf y-X\mathbf w\rVert^2`,
+        eq: R`\hat{\mathbf w}_{\text{ML}}=\arg\min_{\mathbf w}\Big[\htmlClass{c-orange}{\tfrac N2\log(2\pi\sigma^2)}+\frac{\lVert\mathbf y-X\mathbf w\rVert^2}{2\sigma^2}\Big]=\arg\min_{\mathbf w}\frac{\lVert\mathbf y-X\mathbf w\rVert^2}{2\sigma^2}=\arg\min_{\mathbf w}\lVert\mathbf y-X\mathbf w\rVert^2`,
         notes: [
           tag(['I35'], R`drop the constant $\frac N2\log(2\pi\sigma^2)$, then multiply by $2\sigma^2>0$`),
           text(R`For fixed $\sigma^2$, constants and positive scaling do not change the minimiser.`),
@@ -219,7 +237,7 @@ const sections: Section[] = [
     title: 'A Gaussian prior on the coefficients',
     why: R`The likelihood alone gives plain least squares, which can overfit. A prior says, before seeing any data, that the coefficients are probably small. Its negative log turns out to be a squared-norm penalty on $\mathbf w$: the ridge term.`,
     slides: [slide('II', 24, 'A Gaussian prior on the coefficients')],
-    slideNote: R`The slide shows rows 1 and 5. Rows 2 to 4 are added to show where the $\lVert\mathbf w\rVert^2$ comes from.`,
+    slideNote: R`The slide shows the first and last rows. The rows between are added to show where the $\lVert\mathbf w\rVert^2$ comes from.`,
     pre: [
       text('Centred data. Fit the intercept separately without a penalty.'),
       warn(R`The intercept is not inside $\mathbf w$, so the prior (and hence the penalty) does not shrink it.`),
@@ -239,15 +257,22 @@ const sections: Section[] = [
         notes: [tag(['I45'], 'isotropic Gaussian: the density splits into one factor per coefficient'), shape(R`\text{each factor: }1\times1`)],
       },
       {
-        eq: R`-\log p(\mathbf w)=\sum_{j=1}^{D}\Big[\tfrac12\log(2\pi\tau^2)+\frac{w_j^2}{2\tau^2}\Big]`,
+        eq: R`-\log p(\mathbf w)=-\sum_{j=1}^{D}\log\mathcal N(w_j\mid 0,\tau^2)`,
+        notes: [tag(['I34'], 'log of the product is a sum; the minus sign goes in front of the sum')],
+      },
+      {
+        eq: R`=\sum_{j=1}^{D}\Big[\tfrac12\log(2\pi\tau^2)+\frac{w_j^2}{2\tau^2}\Big]`,
         notes: [
-          tag(['I34'], 'log of the product is a sum'),
           tag(['I44'], R`each factor with $\mu=0$ and variance $\tau^2$: $(w_j-0)^2=w_j^2$`),
         ],
       },
       {
-        eq: R`=\htmlClass{c-orange}{\frac D2\log(2\pi\tau^2)}+\frac{1}{2\tau^2}\sum_{j=1}^{D}w_j^2`,
-        notes: [lab(R`the first term appears $D$ times`), con(R`$\frac D2\log(2\pi\tau^2)$ has no $\mathbf w$: constant`)],
+        eq: R`=\sum_{j=1}^{D}\tfrac12\log(2\pi\tau^2)+\sum_{j=1}^{D}\frac{w_j^2}{2\tau^2}=\htmlClass{c-orange}{\frac D2\log(2\pi\tau^2)}+\frac{1}{2\tau^2}\sum_{j=1}^{D}w_j^2`,
+        notes: [
+          tag(['I16'], R`split the sum; the first term does not depend on $j$, so $D$ copies add to $\frac D2\log(2\pi\tau^2)$; $\frac{1}{2\tau^2}$ comes out of the second sum`),
+          lab(R`the first term appears $D$ times`),
+          con(R`$\frac D2\log(2\pi\tau^2)$ has no $\mathbf w$: constant`),
+        ],
       },
       {
         eq: R`-\log p(\mathbf w)=\frac{\lVert\mathbf w\rVert^2}{2\tau^2}+\htmlClass{c-orange}{\text{constant}}`,
@@ -256,7 +281,7 @@ const sections: Section[] = [
           shape(R`\mathbf w^\top\mathbf w:\ (1\times D)(D\times1)=1\times1`),
           text(R`A smaller $\tau^2$ puts more prior mass near zero.`),
           lab(R`smaller $\tau^2$ also means a bigger weight $\frac{1}{2\tau^2}$: a stronger pull towards $\mathbf 0$`),
-          ex(R`$\tau^2=1$ gives weight $\tfrac12$; $\tau^2=0.01$ gives weight $50$.`),
+          ex(R`$\tau^2=1$ gives weight $\tfrac{1}{2\cdot1}=\tfrac12$; $\tau^2=0.01$ gives weight $\tfrac{1}{2\cdot0.01}=\tfrac{1}{0.02}=50$.`),
         ],
       },
     ],
@@ -292,7 +317,7 @@ const sections: Section[] = [
     title: 'MAP estimation gives the ridge objective',
     why: R`Now combine the two halves. Choosing the most probable $\mathbf w$ after seeing the data (MAP) and taking negative logs gives the data-fit term from the likelihood plus the penalty from the prior. That is exactly the ridge objective, with $\lambda=\sigma^2/\tau^2$.`,
     slides: [slide('II', 26, 'MAP estimation gives the ridge objective')],
-    slideNote: R`The slide shows rows 1, 6, 7 and the value of $\lambda_{\text{MSE}}$. Rows 2 to 5 unpack "Bayes' rule, then take negative logs"; the objective in row 8 is added to show where $\lambda_{\text{MSE}}$ comes from.`,
+    slideNote: R`The slide shows the first row, the two ridge objectives and the value of $\lambda_{\text{MSE}}$. The rows in between unpack "Bayes' rule, then take negative logs", including the multiplication by $2\sigma^2$.`,
     derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
@@ -318,9 +343,16 @@ const sections: Section[] = [
         ],
       },
       {
+        eq: R`-\log p(\mathbf y\mid X,\mathbf w)=\tfrac N2\log(2\pi\sigma^2)+\frac{\lVert\mathbf y-X\mathbf w\rVert^2}{2\sigma^2},\qquad -\log p(\mathbf w)=\frac{\lVert\mathbf w\rVert^2}{2\tau^2}+\tfrac D2\log(2\pi\tau^2)`,
+        notes: [
+          lab('the two results of the previous sections, ready to substitute'),
+          shape(R`\text{every term: }1\times1`),
+        ],
+      },
+      {
         eq: R`=\arg\min_{\mathbf w}\Big\{\htmlClass{c-orange}{\tfrac N2\log(2\pi\sigma^2)}+\frac{\lVert\mathbf y-X\mathbf w\rVert^2}{2\sigma^2}+\frac{\lVert\mathbf w\rVert^2}{2\tau^2}+\htmlClass{c-orange}{\text{constant}}\Big\}`,
         notes: [
-          lab('substitute the results of steps 2 and 3'),
+          lab('substitute the two results above'),
           con(R`orange terms have no $\mathbf w$`),
           shape(R`\text{every term: }1\times1`),
         ],
@@ -334,6 +366,12 @@ const sections: Section[] = [
         ],
       },
       {
+        eq: R`=\arg\min_{\mathbf w}\Big\{2\sigma^2\cdot\frac{\lVert\mathbf y-X\mathbf w\rVert^2}{2\sigma^2}+2\sigma^2\cdot\frac{\lVert\mathbf w\rVert^2}{2\tau^2}\Big\}=\arg\min_{\mathbf w}\Big\{\lVert\mathbf y-X\mathbf w\rVert^2+\frac{\sigma^2}{\tau^2}\lVert\mathbf w\rVert^2\Big\}`,
+        notes: [
+          ex(R`multiply the objective by $2\sigma^2>0$, which does not move the minimiser. First term: $2\sigma^2\cdot\frac{1}{2\sigma^2}=1$. Second term: $2\sigma^2\cdot\frac{1}{2\tau^2}=\frac{2\sigma^2}{2\tau^2}=\frac{\sigma^2}{\tau^2}$ (cancel the 2)`),
+        ],
+      },
+      {
         eq: R`=\arg\min_{\mathbf w}\big\{\lVert\mathbf y-X\mathbf w\rVert^2+\lambda\lVert\mathbf w\rVert^2\big\},\qquad \lambda=\frac{\sigma^2}{\tau^2}`,
         notes: [
           tag(['I35'], R`multiply by $2\sigma^2>0$: the first term loses its $\frac{1}{2\sigma^2}$, the second becomes $\frac{2\sigma^2}{2\tau^2}=\frac{\sigma^2}{\tau^2}$`),
@@ -342,7 +380,7 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`\arg\min_{\mathbf w}\Big\{\frac1N\lVert\mathbf y-X\mathbf w\rVert^2+\lambda_{\text{MSE}}\lVert\mathbf w\rVert^2\Big\},\qquad \lambda_{\text{MSE}}=\frac{\sigma^2}{N\tau^2}`,
+        eq: R`\arg\min_{\mathbf w}\Big\{\frac1N\lVert\mathbf y-X\mathbf w\rVert^2+\frac1N\cdot\frac{\sigma^2}{\tau^2}\lVert\mathbf w\rVert^2\Big\}=\arg\min_{\mathbf w}\Big\{\frac1N\lVert\mathbf y-X\mathbf w\rVert^2+\lambda_{\text{MSE}}\lVert\mathbf w\rVert^2\Big\},\qquad \lambda_{\text{MSE}}=\frac{\sigma^2}{N\tau^2}=\frac{\lambda}{N}`,
         notes: [
           text('For mean squared error (RSS / N).'),
           tag(['I35'], R`multiply the previous objective by $\frac1N>0$: the penalty weight becomes $\frac{\lambda}{N}$`),
@@ -391,7 +429,7 @@ const sections: Section[] = [
       slide('I', 56, 'Ridge: the parameter estimate'),
     ],
     nonExaminable: true,
-    slideNote: R`Rows 1 to 3, 5 and 6 are II 28. Row 4 is added to show that $S$ is a scaled version of the inverse in the ridge formula. I 56 is cited for the ridge estimate that $\mathbf m$ equals.`,
+    slideNote: R`The slide's rows are the Gaussian form, the formulas for $\mathbf m$ and $S$, and the example with $X^\top X=NqI$. The rows deriving $S$ and $\mathbf m$ by matching coefficients, and the one showing $S$ is a scaled version of the inverse in the ridge formula, are added. I 56 is cited for the ridge estimate that $\mathbf m$ equals.`,
     derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
@@ -399,6 +437,46 @@ const sections: Section[] = [
         notes: [
           text(R`$\mathbf m$: posterior mean. $S$: posterior covariance.`),
           shape(R`\mathbf m:\ D\times1,\quad S:\ D\times D`),
+        ],
+      },
+      {
+        eq: R`-\log p(\mathbf w\mid X,\mathbf y)=\frac{1}{2\sigma^2}\lVert\mathbf y-X\mathbf w\rVert^2+\frac{1}{2\tau^2}\lVert\mathbf w\rVert^2+\text{const}`,
+        notes: [
+          lab(R`from the MAP derivation: negative log of likelihood times prior, with every term free of $\mathbf w$ lumped into const`),
+        ],
+      },
+      {
+        eq: R`=\frac{1}{2\sigma^2}\big(\mathbf y^\top\mathbf y-2\,\mathbf y^\top X\mathbf w+\mathbf w^\top X^\top X\mathbf w\big)+\frac{1}{2\tau^2}\mathbf w^\top\mathbf w+\text{const}`,
+        notes: [
+          tag(['I2', 'I3'], R`expand the squared norm exactly as in the least-squares topic`),
+          shape(R`\text{each term: }1\times1`),
+        ],
+      },
+      {
+        eq: R`=\tfrac12\,\mathbf w^\top\Big(\frac{X^\top X}{\sigma^2}+\frac{I}{\tau^2}\Big)\mathbf w-\frac{1}{\sigma^2}\,\mathbf y^\top X\mathbf w+\text{const}`,
+        notes: [
+          ex(R`collect the terms that have $\mathbf w$ twice (quadratic) and once (linear); $\mathbf y^\top\mathbf y$ joins const; $\frac{1}{2\tau^2}\mathbf w^\top\mathbf w=\tfrac12\mathbf w^\top\frac{I}{\tau^2}\mathbf w$ and $\frac{-2}{2\sigma^2}=-\frac1{\sigma^2}$`),
+        ],
+      },
+      {
+        eq: R`-\log\mathcal N(\mathbf w\mid\mathbf m,S)=\tfrac12(\mathbf w-\mathbf m)^\top S^{-1}(\mathbf w-\mathbf m)+\text{const}=\tfrac12\,\mathbf w^\top S^{-1}\mathbf w-\mathbf m^\top S^{-1}\mathbf w+\text{const}`,
+        notes: [
+          tag(['I39'], R`the exponent of the multivariate Gaussian density, with a minus sign; multiply out the bracket, and $\mathbf m^\top S^{-1}\mathbf w$ is a scalar equal to its transpose $\mathbf w^\top S^{-1}\mathbf m$`),
+          lab(R`so the two must be the same quadratic in $\mathbf w$: match the quadratic and linear parts`),
+        ],
+      },
+      {
+        eq: R`S^{-1}=\frac{X^\top X}{\sigma^2}+\frac{I}{\tau^2},\qquad \mathbf m^\top S^{-1}=\frac{\mathbf y^\top X}{\sigma^2}`,
+        notes: [
+          ex(R`matching the coefficients of the quadratic part and of the linear part`),
+          shape(R`S^{-1}:\ D\times D,\quad \mathbf m^\top S^{-1}:\ (1\times D)(D\times D)=1\times D`),
+        ],
+      },
+      {
+        eq: R`S^{-1}\mathbf m=\frac{X^\top\mathbf y}{\sigma^2}\ \Rightarrow\ \mathbf m=S\,\frac{X^\top\mathbf y}{\sigma^2}`,
+        notes: [
+          tag(['I2'], R`transpose both sides of $\mathbf m^\top S^{-1}=\mathbf y^\top X/\sigma^2$; $S^{-1}$ is symmetric (a sum of symmetric matrices), so $(\mathbf m^\top S^{-1})^\top=S^{-1}\mathbf m$`),
+          ex(R`multiply both sides on the left by $S$`),
         ],
       },
       {
@@ -410,14 +488,20 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`S=\Big(\frac{X^\top X}{\sigma^2}+\frac{I}{\tau^2}\Big)^{-1}`,
+        eq: R`S=\Big(\frac{X^\top X}{\sigma^2}+\frac{I}{\tau^2}\Big)^{-1}\quad(\text{from the matched quadratic part})`,
         notes: [shape(R`X^\top X:\ (D\times N)(N\times D)=D\times D,\quad I:\ D\times D,\quad S:\ D\times D`)],
       },
       {
         eq: R`S=\Big(\frac{1}{\sigma^2}\big(X^\top X+\lambda I\big)\Big)^{-1}=\sigma^2\big(X^\top X+\lambda I\big)^{-1}`,
         notes: [
-          lab(R`factor out $\frac{1}{\sigma^2}$, using $\frac{1}{\tau^2}=\frac{1}{\sigma^2}\cdot\frac{\sigma^2}{\tau^2}=\frac{\lambda}{\sigma^2}$`),
+          lab(R`factor out $\frac{1}{\sigma^2}$, using $\frac{1}{\tau^2}=\frac{1}{\sigma^2}\cdot\frac{\sigma^2}{\tau^2}=\frac{\lambda}{\sigma^2}$, so $\frac{X^\top X}{\sigma^2}+\frac{\lambda I}{\sigma^2}=\frac{1}{\sigma^2}(X^\top X+\lambda I)$`),
           tag(['I47'], R`$(cA)^{-1}=\frac1c A^{-1}$ with $c=\frac{1}{\sigma^2}$`),
+        ],
+      },
+      {
+        eq: R`\mathbf m=\sigma^2(X^\top X+\lambda I)^{-1}\,\frac{X^\top\mathbf y}{\sigma^2}=(X^\top X+\lambda I)^{-1}X^\top\mathbf y`,
+        notes: [
+          ex(R`substitute $S=\sigma^2(X^\top X+\lambda I)^{-1}$ into $\mathbf m=S\,X^\top\mathbf y/\sigma^2$; the two $\sigma^2$ cancel. This is the ridge estimate, as claimed in row 2`),
         ],
       },
       {
@@ -429,7 +513,7 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`S=\Big(\frac{Nq}{\sigma^2}+\frac{1}{\tau^2}\Big)^{-1}I\ \longrightarrow\ 0\qquad(N\to\infty)`,
+        eq: R`S=\Big(\frac{Nq}{\sigma^2}I+\frac{1}{\tau^2}I\Big)^{-1}=\Big[\Big(\frac{Nq}{\sigma^2}+\frac{1}{\tau^2}\Big)I\Big]^{-1}=\Big(\frac{Nq}{\sigma^2}+\frac{1}{\tau^2}\Big)^{-1}I\ \longrightarrow\ 0\qquad(N\to\infty)`,
         notes: [
           tag(['I47'], R`$\frac{Nq}{\sigma^2}I+\frac{1}{\tau^2}I=\big(\frac{Nq}{\sigma^2}+\frac{1}{\tau^2}\big)I$, then invert the scalar`),
           lab(R`the scalar in brackets grows with $N$, so its inverse goes to $0$`),
@@ -459,6 +543,12 @@ const sections: Section[] = [
         notes: [lab(R`$\mathbf w$ is uncertain, with posterior covariance $S$`), shape(R`\mathbf x_*:\ D\times1,\quad f_*:\ (1\times D)(D\times1)=1\times1`)],
       },
       {
+        eq: R`\operatorname{Var}(f_*\mid\mathcal D)=\operatorname{Var}\Big(\sum_{j=1}^{D}x_{*j}w_j\Big)=\sum_{j=1}^{D}\sum_{k=1}^{D}x_{*j}\,x_{*k}\operatorname{Cov}(w_j,w_k)=\sum_{j,k}x_{*j}S_{jk}x_{*k}`,
+        notes: [
+          ex(R`$\operatorname{Var}\big(\sum_ja_jw_j\big)$ is the sum over all pairs $(j,k)$ of $a_ja_k\operatorname{Cov}(w_j,w_k)$; the covariance of $w_j$ and $w_k$ is entry $S_{jk}$ (diagonal: variances, off-diagonal: covariances)`),
+        ],
+      },
+      {
         eq: R`\operatorname{Var}(f_*\mid\mathcal D)=\mathbf x_*^\top S\,\mathbf x_*`,
         notes: [
           tag(['I48'], R`variance of $\mathbf a^\top\mathbf w$ with $\mathbf a=\mathbf x_*$ and $\operatorname{Cov}(\mathbf w)=S$`),
@@ -470,7 +560,7 @@ const sections: Section[] = [
         notes: [lab(R`a new measurement adds fresh noise, independent of the training data and of $\mathbf w$`)],
       },
       {
-        eq: R`\operatorname{Var}(y_*\mid\mathcal D)=\mathbf x_*^\top S\,\mathbf x_*+\sigma^2`,
+        eq: R`\operatorname{Var}(y_*\mid\mathcal D)=\operatorname{Var}(f_*\mid\mathcal D)+\operatorname{Var}(\epsilon_*)=\mathbf x_*^\top S\,\mathbf x_*+\sigma^2`,
         notes: [tag(['I49'], 'independent parts: the variances add'), shape(R`1\times1`)],
       },
     ],

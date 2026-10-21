@@ -86,13 +86,17 @@ const sections: Section[] = [
     title: 'Uncorrelated errors can average out',
     why: R`If the learners' errors are unrelated, squaring their average kills all the cross-terms, and the committee error falls to $1/K$ of the average individual error. If the errors are shared, nothing cancels. This is why random forests work so hard to make trees different.`,
     slides: [slide('L2', 97, 'Uncorrelated errors can average out')],
-    slideNote: R`Rows 2 and 4 show the expansion and the linearity step that the slide combines. The numbers and the "identical errors" callout are added.`,
+    slideNote: R`Rows 3 and 5 show the expansion and the linearity step that the slide combines; row 2 multiplies out the square of a sum in full. The numbers and the "identical errors" callout are added.`,
     pre: [text('Assume zero-mean errors, uncorrelated across different predictors.')],
     derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
         eq: R`\mathbb E_{\mathbf x}\big[\epsilon_k(\mathbf x)\,\epsilon_{k'}(\mathbf x)\big]=0\quad\text{for }k\ne k'`,
         notes: [term('Uncorrelated errors'), lab('on average, one learner being too high says nothing about another')],
+      },
+      {
+        eq: R`\Big(\sum_k\epsilon_k\Big)^2=\Big(\sum_k\epsilon_k\Big)\Big(\sum_{k'}\epsilon_{k'}\Big)=\sum_k\sum_{k'}\epsilon_k\epsilon_{k'}=\sum_k\epsilon_k^2+\sum_k\sum_{k'\ne k}\epsilon_k\epsilon_{k'}`,
+        notes: [lab(R`multiply out term by term: every pair $(k,k')$ appears once; the pairs with $k'=k$ are the squares, the rest are the cross terms`)],
       },
       {
         eq: R`\Big(\frac1K\sum_k\epsilon_k\Big)^2=\frac1{K^2}\Big(\sum_k\epsilon_k^2+\sum_k\sum_{k'\ne k}\epsilon_k\epsilon_{k'}\Big)`,
@@ -103,14 +107,14 @@ const sections: Section[] = [
         notes: [tag(['I25'], 'expectation is linear: take it term by term')],
       },
       {
-        eq: R`=\frac{1}{K^2}\sum_kE_k=\frac1K\,E_{\text{AV}}`,
+        eq: R`=\frac{1}{K^2}\Big(\sum_kE_k+0\Big)=\frac{1}{K^2}\cdot K\,E_{\text{AV}}=\frac1K\,E_{\text{AV}}`,
         notes: [
           lab(R`cross terms vanish for $k\ne k'$; then $\sum_kE_k=K\,E_{\text{AV}}$`),
           lab('averaging reduces independent variation'),
         ],
       },
       {
-        eq: R`K=10,\ E_{\text{AV}}=0.2:\quad E_{\text{COM}}=0.02`,
+        eq: R`K=10,\ E_{\text{AV}}=0.2:\quad E_{\text{COM}}=\frac{0.2}{10}=0.02`,
         notes: [ex('ten learners with unrelated errors: ten times smaller error')],
       },
     ],

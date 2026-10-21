@@ -42,7 +42,7 @@ const sections: Section[] = [
     slides: [slide('L2', 129, 'Accuracy')],
     rows: [
       {
-        eq: R`\text{Accuracy}=\frac{TP+TN}{TP+FN+FP+TN}=\frac58=62.5\%`,
+        eq: R`\text{Accuracy}=\frac{TP+TN}{TP+FN+FP+TN}=\frac{3+2}{3+1+2+2}=\frac58=62.5\%`,
         notes: [
           term('Accuracy'),
           lab('counts all correct predictions: the diagonal of the table'),
@@ -59,7 +59,7 @@ const sections: Section[] = [
     slides: [slide('L2', 130, 'Precision')],
     rows: [
       {
-        eq: R`\text{Precision}=\frac{TP}{TP+FP}=\frac35=60\%`,
+        eq: R`\text{Precision}=\frac{TP}{TP+FP}=\frac{3}{3+2}=\frac35=60\%`,
         notes: [
           term('Precision'),
           lab('among predicted positives (the "Predicted 1" column), what fraction are truly positive?'),
@@ -76,7 +76,7 @@ const sections: Section[] = [
     slides: [slide('L2', 131, 'Recall')],
     rows: [
       {
-        eq: R`\text{Recall}=\frac{TP}{TP+FN}=\frac34=75\%`,
+        eq: R`\text{Recall}=\frac{TP}{TP+FN}=\frac{3}{3+1}=\frac34=75\%`,
         notes: [
           term('Recall'),
           lab('among actual positives (the "Actual 1" row), what fraction did we find?'),
@@ -93,8 +93,8 @@ const sections: Section[] = [
     slides: [slide('L2', 132, 'Precision and recall')],
     rows: [
       {
-        eq: R`\text{Precision}=\frac{TP}{TP+FP}=\frac35=60\%,\qquad\text{Recall}=\frac{TP}{TP+FN}=\frac34=75\%`,
-        notes: [],
+        eq: R`\text{Precision}=\frac{TP}{TP+FP}=\frac{3}{3+2}=\frac35=60\%,\qquad\text{Recall}=\frac{TP}{TP+FN}=\frac{3}{3+1}=\frac34=75\%`,
+        notes: [lab(R`the numerator is the same $TP=3$; only the denominator changes: it adds the false positives for precision and the false negatives for recall`)],
       },
       {
         eq: R`\begin{array}{l|l}\text{Pattern} & \text{Interpretation}\\ \hline\text{High recall, low precision} & \text{finds most positives, with many false alarms}\\ \text{High precision, low recall} & \text{few false alarms, but misses many positives}\end{array}`,
@@ -108,7 +108,7 @@ const sections: Section[] = [
     title: 'F-score',
     why: R`One number that is high only when both precision and recall are high: their harmonic mean. A weight $b$ lets you say how much more recall matters than precision.`,
     slides: [slide('L2', 133, 'F-score')],
-    slideNote: 'The numbers are added, using the confusion matrix above.',
+    slideNote: R`The count form is derived (rows 2 to 4) and the numbers are added, using the confusion matrix above.`,
     rows: [
       {
         eq: R`F_1=\frac{2\,\text{Prec}\,\text{Rec}}{\text{Prec}+\text{Rec}}=\frac{2TP}{2TP+FP+FN}`,
@@ -119,7 +119,22 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`F_1=\frac{2(0.6)(0.75)}{0.6+0.75}=\frac{0.9}{1.35}=0.667=\frac{6}{6+2+1}`,
+        eq: R`\text{Prec}=\frac{TP}{TP+FP},\quad\text{Rec}=\frac{TP}{TP+FN}\ \Rightarrow\ F_1=\frac{2\cdot\dfrac{TP}{TP+FP}\cdot\dfrac{TP}{TP+FN}}{\dfrac{TP}{TP+FP}+\dfrac{TP}{TP+FN}}`,
+        notes: [lab('substitute the definitions of precision and recall into the harmonic mean')],
+      },
+      {
+        eq: R`F_1=\frac{2\,TP^2}{TP\,(TP+FN)+TP\,(TP+FP)}`,
+        notes: [lab(R`multiply the top and the bottom by $(TP+FP)(TP+FN)$ to clear the fractions: on top the denominators cancel, leaving $2TP\cdot TP$; on the bottom, $\frac{TP}{TP+FP}$ times $(TP+FP)(TP+FN)$ leaves $TP\,(TP+FN)$, and the second term leaves $TP\,(TP+FP)$`)],
+      },
+      {
+        eq: R`F_1=\frac{2\,TP^2}{TP\,(2TP+FP+FN)}=\frac{2TP}{2TP+FP+FN}`,
+        notes: [
+          lab(R`factor $TP$ out of the bottom: $TP+FN+TP+FP=2TP+FP+FN$`),
+          lab(R`cancel one factor of $TP$ from top and bottom (needs $TP>0$; if $TP=0$ then $F_1=0$)`),
+        ],
+      },
+      {
+        eq: R`F_1=\frac{2(0.6)(0.75)}{0.6+0.75}=\frac{0.9}{1.35}=0.667,\qquad F_1=\frac{2\cdot3}{2\cdot3+2+1}=\frac{6}{9}=0.667`,
         notes: [ex('both forms agree')],
       },
       {
@@ -132,8 +147,12 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`F_2=\frac{5(0.45)}{4(0.6)+0.75}=0.714,\qquad F_{0.5}=\frac{1.25(0.45)}{0.25(0.6)+0.75}=0.625`,
-        notes: [ex('recall (0.75) is the higher score here, so weighting recall raises F')],
+        eq: R`F_2=\frac{(1+4)(0.6)(0.75)}{4(0.6)+0.75}=\frac{5(0.45)}{2.4+0.75}=\frac{2.25}{3.15}=0.714,\qquad F_{0.5}=\frac{(1+0.25)(0.45)}{0.25(0.6)+0.75}=\frac{0.5625}{0.15+0.75}=\frac{0.5625}{0.9}=0.625`,
+        notes: [
+          lab(R`$\text{Prec}\cdot\text{Rec}=0.6\times0.75=0.45$; for $b=2$: $b^2=4$; for $b=0.5$: $b^2=0.25$`),
+          ex('recall (0.75) is the higher score here, so weighting recall raises F'),
+          lab(R`check $b=1$: $(1+1)\frac{PR}{1\cdot P+R}=\frac{2PR}{P+R}=F_1$`),
+        ],
       },
     ],
   },
@@ -146,11 +165,11 @@ const sections: Section[] = [
     pre: [text('Inspect class counts and per-class recall alongside aggregate accuracy.')],
     rows: [
       {
-        eq: R`\begin{array}{c|cc}\text{Actual / predicted} & \text{Class 1} & \text{Class 0}\\ \hline\text{Class 1} & 70 & 30\\ \text{Class 0} & 10 & 90\end{array}\qquad\text{Accuracy}=\frac{70+90}{200}=80\%`,
+        eq: R`\begin{array}{c|cc}\text{Actual / predicted} & \text{Class 1} & \text{Class 0}\\ \hline\text{Class 1} & 70 & 30\\ \text{Class 0} & 10 & 90\end{array}\qquad\text{Accuracy}=\frac{70+90}{70+30+10+90}=\frac{160}{200}=80\%`,
         notes: [ex(R`left table. Recall: $70/100=70\%$ for class 1, $90/100=90\%$ for class 0`)],
       },
       {
-        eq: R`\begin{array}{c|cc}\text{Actual / predicted} & \text{Class 1} & \text{Class 0}\\ \hline\text{Class 1} & 700 & 300\\ \text{Class 0} & 100 & 0\end{array}\qquad\text{Accuracy}=\frac{700+0}{1100}\approx63.6\%`,
+        eq: R`\begin{array}{c|cc}\text{Actual / predicted} & \text{Class 1} & \text{Class 0}\\ \hline\text{Class 1} & 700 & 300\\ \text{Class 0} & 100 & 0\end{array}\qquad\text{Accuracy}=\frac{700+0}{700+300+100+0}=\frac{700}{1100}\approx63.6\%`,
         notes: [
           ex(R`right table. Recall: $700/1000=70\%$ for class 1, $0/100=0\%$ for class 0`),
           warn('the minority class has zero recall'),
@@ -171,7 +190,7 @@ const sections: Section[] = [
     title: 'Micro and macro averages',
     why: R`With more than two classes each class has its own precision and recall. Macro-averaging gives every class equal weight (so rare classes count); micro-averaging pools the counts first (so common classes dominate).`,
     slides: [slide('L2', 135, 'Micro and macro averages')],
-    slideNote: R`The per-class counts (row 3) and all the numbers are worked out from the slide's 8-item table.`,
+    slideNote: R`The per-class counts (row 3), the per-class ratios (row 4) and all the numbers are worked out from the slide's 8-item table.`,
     pre: [
       text(R`Labels: $+$, $\circ$, $-$, $\times$ ($C=4$). Predictions for IDs 1 to 8: (+,+), (+,×), (∘,∘), (∘,∘), (−,−), (−,+), (×,×), (×,+), written (label, prediction).`),
       text(R`$C$ is the class count. $P_c$ and $R_c$ are per-class precision and recall.`),
@@ -193,8 +212,20 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`P_{\text{macro}}=\tfrac14\big(\tfrac13+1+1+\tfrac12\big)=0.708,\qquad R_{\text{macro}}=\tfrac14\big(\tfrac12+1+\tfrac12+\tfrac12\big)=0.625`,
-        notes: [ex('macro averages')],
+        eq: R`P_+=\tfrac{1}{1+2}=\tfrac13,\ R_+=\tfrac{1}{1+1}=\tfrac12;\quad P_\circ=\tfrac{2}{2+0}=1,\ R_\circ=\tfrac{2}{2+0}=1;\quad P_-=\tfrac{1}{1+0}=1,\ R_-=\tfrac{1}{1+1}=\tfrac12;\quad P_\times=\tfrac{1}{1+1}=\tfrac12,\ R_\times=\tfrac{1}{1+1}=\tfrac12`,
+        notes: [lab(R`per class: $P_c=\frac{TP_c}{TP_c+FP_c}$ and $R_c=\frac{TP_c}{TP_c+FN_c}$, with the counts from the table in row 3`)],
+      },
+      {
+        eq: R`P_{\text{macro}}=\tfrac14\big(\tfrac13+1+1+\tfrac12\big)=\tfrac14\cdot\tfrac{2+6+6+3}{6}=\tfrac14\cdot\tfrac{17}{6}=\tfrac{17}{24}=0.708`,
+        notes: [ex(R`common denominator 6: $\tfrac13=\tfrac26$, $1=\tfrac66$, $\tfrac12=\tfrac36$`)],
+      },
+      {
+        eq: R`R_{\text{macro}}=\tfrac14\big(\tfrac12+1+\tfrac12+\tfrac12\big)=\tfrac14\cdot\tfrac{5}{2}=\tfrac58=0.625`,
+        notes: [ex(R`$\tfrac12+1+\tfrac12+\tfrac12=2.5=\tfrac52$`)],
+      },
+      {
+        eq: R`\textstyle\sum_cTP_c=1+2+1+1=5,\quad\sum_cFP_c=2+0+0+1=3,\quad\sum_cFN_c=1+0+1+1=3`,
+        notes: [lab('the totals in the last row of the table')],
       },
       {
         eq: R`P_{\text{micro}}=\frac{5}{5+3}=0.625,\qquad R_{\text{micro}}=\frac{5}{5+3}=0.625=\text{accuracy }\tfrac58`,

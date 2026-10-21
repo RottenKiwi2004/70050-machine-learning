@@ -1,4 +1,4 @@
-import { R, ex, lab, shape, slide, tag, term, text, warn } from 'principia';
+import { R, con, ex, lab, shape, slide, tag, term, text, warn } from 'principia';
 import type { Identity, Section, Topic } from 'principia';
 
 const identities: Identity[] = [
@@ -99,7 +99,7 @@ const sections: Section[] = [
         notes: [ex('the minus sign disappears in every norm'), shape(R`\mathbf w:\ 2\times1\ (D=2)`)],
       },
       {
-        eq: R`w_j=0.1:\quad |w_j|=0.1,\quad w_j^2=0.01`,
+        eq: R`w_j=0.1:\quad |w_j|=0.1,\quad w_j^2=0.1^2=0.01,\qquad \frac{d}{dw_j}w_j^2=2(0.1)=0.2,\quad \frac{d}{dw_j}|w_j|=1`,
         notes: [
           tag(['I52'], R`the slope of $w_j^2$ is $2w_j\to0$ near zero; the slope of $|w_j|$ stays $\pm1$`),
           lab(R`so ridge barely pushes a small coefficient further, but LASSO keeps pushing with the same force $\lambda$, so a coefficient whose data-fit slope at $0$ is at most $\lambda$ ends up exactly $0$`),
@@ -113,6 +113,64 @@ const sections: Section[] = [
         heading: 'No closed form',
         flag: 'I52',
         text: R`Because $|w_j|$ has a corner at $0$ (no derivative there), the ridge trick of setting the gradient to zero and solving one linear system (I 56) does not give a formula for the LASSO solution in general (except special cases such as $X^\top X=I$, where it is soft-thresholding). It is found by an iterative algorithm instead.`,
+      },
+    ],
+  },
+  {
+    id: 'soft-threshold',
+    title: R`Special case $X^\top X=I$: why coefficients hit exactly zero`,
+    why: R`In general LASSO has no closed form, but when the columns of $X$ are orthonormal the problem splits into $D$ separate one-coefficient problems that we can solve by hand. This shows precisely when a coefficient becomes exactly zero.`,
+    slides: [slide('II', 33, 'LASSO: an L1 coefficient penalty')],
+    slideNote: R`Not on the slides: added to derive the statement in the "No closed form" callout step by step. It uses the identity of the L2-geometry section below, $\lVert\mathbf y-X\mathbf w\rVert^2=\lVert\mathbf w-\hat{\mathbf w}_{\text{LS}}\rVert^2+\text{const}$ when $X^\top X=I$.`,
+    pre: [text(R`Assume $X^\top X=I$ ($D\times D$). Write $\hat w_j$ for coordinate $j$ of the least-squares solution $\hat{\mathbf w}_{\text{LS}}=X^\top\mathbf y$.`)],
+    derive: true,
+    rows: [
+      {
+        eq: R`J_{\text{lasso}}(\mathbf w)=\lVert\mathbf w-\hat{\mathbf w}_{\text{LS}}\rVert_2^2+\lambda\lVert\mathbf w\rVert_1+\text{const}`,
+        notes: [
+          tag(['I55'], R`replace the RSS by the squared distance to $\hat{\mathbf w}_{\text{LS}}$ plus a constant`),
+          shape(R`J_{\text{lasso}}:\ 1\times1`),
+        ],
+      },
+      {
+        eq: R`=\sum_{j=1}^{D}\big(w_j-\hat w_j\big)^2+\lambda\sum_{j=1}^{D}|w_j|+\text{const}=\sum_{j=1}^{D}\Big[\big(w_j-\hat w_j\big)^2+\lambda|w_j|\Big]+\text{const}`,
+        notes: [
+          tag(['I51', 'I50'], R`write both norms as sums over the coordinates, then combine the two sums`),
+          lab(R`each bracket contains only $w_j$: the $D$ problems can be solved one at a time`),
+        ],
+      },
+      {
+        eq: R`f(w)=(w-\hat w)^2+\lambda|w|,\qquad \lambda>0`,
+        notes: [lab(R`one coefficient: drop the index $j$; minimise $f$ over the single number $w$`), shape(R`w,\ \hat w,\ f:\ 1\times1`)],
+      },
+      {
+        eq: R`w>0:\quad f'(w)=2(w-\hat w)+\lambda=0\ \Rightarrow\ w=\hat w-\frac{\lambda}{2}`,
+        notes: [
+          tag(['I52'], R`for $w>0$, $|w|=w$ has slope $+1$`),
+          ex(R`this is a valid answer only if it is positive, i.e. only if $\hat w>\frac\lambda2$`),
+        ],
+      },
+      {
+        eq: R`w<0:\quad f'(w)=2(w-\hat w)-\lambda=0\ \Rightarrow\ w=\hat w+\frac{\lambda}{2}`,
+        notes: [
+          tag(['I52'], R`for $w<0$, $|w|=-w$ has slope $-1$`),
+          ex(R`valid only if it is negative, i.e. only if $\hat w<-\frac\lambda2$`),
+        ],
+      },
+      {
+        eq: R`|\hat w|\le\frac{\lambda}{2}\ \Rightarrow\ \hat w_{\text{lasso}}=0`,
+        notes: [
+          ex(R`otherwise neither slope can be zero: for $w>0$, $f'(w)=2(w-\hat w)+\lambda>0$ because $2w>0$ and $\lambda-2\hat w\ge0$; for $w<0$, $f'(w)<0$ by the mirror argument. So $f$ falls until $0$ and rises after it: the minimum is at the corner $w=0$`),
+          lab(R`this is the threshold: a coefficient whose least-squares value is small is set to exactly zero`),
+        ],
+      },
+      {
+        eq: R`\hat w_{\text{lasso}}=\operatorname{sign}(\hat w)\max\!\Big(|\hat w|-\frac{\lambda}{2},\,0\Big)`,
+        notes: [
+          term('Soft-thresholding'),
+          ex(R`example: $\lambda=1$, $\hat w=0.3\to\max(0.3-0.5,0)=0$; $\hat w=1.2\to1.2-0.5=0.7$; $\hat w=-1.2\to-(1.2-0.5)=-0.7$`),
+          lab(R`large coefficients are shrunk by $\lambda/2$; small ones are cut to zero`),
+        ],
       },
     ],
   },
@@ -140,7 +198,10 @@ const sections: Section[] = [
       },
       {
         eq: R`\text{ridge: }\min_{\mathbf w}\ \lVert\mathbf y-X\mathbf w\rVert_2^2\quad\text{s.t.}\quad\lVert\mathbf w\rVert_2^2\le r\iff\lVert\mathbf w\rVert_2\le\sqrt r`,
-        notes: [lab(R`squaring or not gives the same round ball, just with radius $\sqrt r$`)],
+        notes: [
+          lab(R`squaring or not gives the same round ball, just with radius $\sqrt r$`),
+          ex(R`$\lVert\mathbf w\rVert_2^2\le r$: both sides are non-negative and the square root is increasing, so taking the square root of both sides keeps the inequality: $\lVert\mathbf w\rVert_2\le\sqrt r$`),
+        ],
       },
     ],
     callouts: [
@@ -182,7 +243,7 @@ const sections: Section[] = [
         notes: [lab('L2 unit ball: a disc of radius 1, round everywhere, no corners'), tag(['I1'], R`$w_1^2+w_2^2=\mathbf w^\top\mathbf w=\lVert\mathbf w\rVert_2^2\le1$, the same as $\lVert\mathbf w\rVert_2\le1$`)],
       },
       {
-        eq: R`\mathbf w=\begin{bmatrix}0.5\\0.5\end{bmatrix}:\quad \lVert\mathbf w\rVert_1=1,\quad \lVert\mathbf w\rVert_2=\sqrt{0.5}\approx0.71`,
+        eq: R`\mathbf w=\begin{bmatrix}0.5\\0.5\end{bmatrix}:\quad \lVert\mathbf w\rVert_1=0.5+0.5=1,\quad \lVert\mathbf w\rVert_2=\sqrt{0.5^2+0.5^2}=\sqrt{0.25+0.25}=\sqrt{0.5}\approx0.71`,
         notes: [ex(R`on the boundary of the diamond, but strictly inside the disc`), shape(R`\mathbf w:\ 2\times1`)],
       },
       {
@@ -211,8 +272,36 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`\mathbf v=\begin{bmatrix}3\\4\end{bmatrix},\ \mu=1:\quad \lVert\mathbf v\rVert_2=5,\quad \Pi(\mathbf v)=\begin{bmatrix}0.6\\0.8\end{bmatrix}`,
-        notes: [ex('both coordinates are shrunk, neither becomes zero')],
+        eq: R`\mathbf v=\begin{bmatrix}3\\4\end{bmatrix},\ \mu=1:\quad \lVert\mathbf v\rVert_2=\sqrt{3^2+4^2}=\sqrt{25}=5,\quad \Pi(\mathbf v)=1\cdot\frac{1}{5}\begin{bmatrix}3\\4\end{bmatrix}=\begin{bmatrix}0.6\\0.8\end{bmatrix}`,
+        notes: [ex('both coordinates are shrunk, neither becomes zero'), lab(R`check: $0.6^2+0.8^2=0.36+0.64=1=\mu^2$, so the result lies on the circle`)],
+      },
+      {
+        eq: R`\lVert\mathbf y-X\mathbf w\rVert_2^2=\mathbf y^\top\mathbf y-2\,\mathbf y^\top X\mathbf w+\mathbf w^\top X^\top X\mathbf w=\mathbf y^\top\mathbf y-2\,\mathbf y^\top X\mathbf w+\mathbf w^\top\mathbf w`,
+        notes: [
+          ex(R`expand the squared norm as in the least-squares topic; then use $X^\top X=I$, so $\mathbf w^\top X^\top X\mathbf w=\mathbf w^\top I\mathbf w=\mathbf w^\top\mathbf w$`),
+          shape(R`\text{each term: }1\times1`),
+        ],
+      },
+      {
+        eq: R`\hat{\mathbf w}_{\text{LS}}=(X^\top X)^{-1}X^\top\mathbf y=I^{-1}X^\top\mathbf y=X^\top\mathbf y\ \Rightarrow\ \mathbf y^\top X=\hat{\mathbf w}_{\text{LS}}^\top`,
+        notes: [
+          ex(R`with $X^\top X=I$ the inverse is $I^{-1}=I$; transposing $X^\top\mathbf y$ gives $\mathbf y^\top X$`),
+          shape(R`\hat{\mathbf w}_{\text{LS}}:\ D\times1`),
+        ],
+      },
+      {
+        eq: R`\lVert\mathbf y-X\mathbf w\rVert_2^2=\mathbf y^\top\mathbf y-2\,\hat{\mathbf w}_{\text{LS}}^\top\mathbf w+\mathbf w^\top\mathbf w=\Big(\mathbf w^\top\mathbf w-2\,\hat{\mathbf w}_{\text{LS}}^\top\mathbf w+\hat{\mathbf w}_{\text{LS}}^\top\hat{\mathbf w}_{\text{LS}}\Big)+\underbrace{\mathbf y^\top\mathbf y-\hat{\mathbf w}_{\text{LS}}^\top\hat{\mathbf w}_{\text{LS}}}_{\text{const}}`,
+        notes: [
+          ex(R`complete the square: add and subtract $\hat{\mathbf w}_{\text{LS}}^\top\hat{\mathbf w}_{\text{LS}}$`),
+          con(R`the underbraced part has no $\mathbf w$: constant`),
+        ],
+      },
+      {
+        eq: R`=(\mathbf w-\hat{\mathbf w}_{\text{LS}})^\top(\mathbf w-\hat{\mathbf w}_{\text{LS}})+\text{const}=\lVert\mathbf w-\hat{\mathbf w}_{\text{LS}}\rVert_2^2+\text{const}`,
+        notes: [
+          ex(R`multiply out $(\mathbf w-\hat{\mathbf w})^\top(\mathbf w-\hat{\mathbf w})=\mathbf w^\top\mathbf w-\mathbf w^\top\hat{\mathbf w}-\hat{\mathbf w}^\top\mathbf w+\hat{\mathbf w}^\top\hat{\mathbf w}$; the two middle terms are equal scalars, giving $-2\hat{\mathbf w}^\top\mathbf w$`),
+          tag(['I1'], 'a vector dotted with itself is its squared norm'),
+        ],
       },
     ],
     callouts: [
@@ -245,16 +334,20 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`\mathbf v=\begin{bmatrix}3\\0.5\end{bmatrix},\ \mu=1:\quad \Pi_{\ell_1}(\mathbf v)=\begin{bmatrix}1\\0\end{bmatrix},\qquad \Pi_{\ell_2}(\mathbf v)\approx\begin{bmatrix}0.99\\0.16\end{bmatrix}`,
+        eq: R`\mathbf v=\begin{bmatrix}3\\0.5\end{bmatrix},\ \mu=1:\quad \Pi_{\ell_1}(\mathbf v)=\begin{bmatrix}1\\0\end{bmatrix},\qquad \Pi_{\ell_2}(\mathbf v)=\frac{1}{\sqrt{3^2+0.5^2}}\begin{bmatrix}3\\0.5\end{bmatrix}=\frac{1}{3.041}\begin{bmatrix}3\\0.5\end{bmatrix}\approx\begin{bmatrix}0.99\\0.16\end{bmatrix}`,
         notes: [
+          ex(R`L1 projection check: try the edge $w_1+w_2=1$. Moving $\mathbf v$ straight onto that line subtracts $\frac{3+0.5-1}{2}=1.25$ from each coordinate, giving $(1.75,-0.75)$, whose second coordinate is negative, so that point is outside the diamond. The nearest point of the diamond is then the corner $(1,0)$`),
           ex(R`$\mathbf v$ is in the green wedge, so the L1 projection is the corner: the second coordinate becomes exactly $0$`),
           lab(R`the L2 projection (I54) only shrinks it: still nonzero`),
           shape(R`\mathbf v:\ 2\times1`),
         ],
       },
       {
-        eq: R`\mathbf v=\begin{bmatrix}1\\0.8\end{bmatrix},\ \mu=1:\quad \Pi_{\ell_1}(\mathbf v)=\begin{bmatrix}0.6\\0.4\end{bmatrix}`,
-        notes: [ex(R`between the wedges (like the blue ray): it lands on the edge $w_1+w_2=1$, both coordinates nonzero`)],
+        eq: R`\mathbf v=\begin{bmatrix}1\\0.8\end{bmatrix},\ \mu=1:\quad \frac{1+0.8-1}{2}=0.4\ \Rightarrow\ \Pi_{\ell_1}(\mathbf v)=\begin{bmatrix}1\\0.8\end{bmatrix}-0.4\begin{bmatrix}1\\1\end{bmatrix}=\begin{bmatrix}0.6\\0.4\end{bmatrix}`,
+        notes: [
+          ex(R`between the wedges (like the blue ray): it lands on the edge $w_1+w_2=1$, both coordinates nonzero`),
+          lab(R`the amount $0.4$ is how far $v_1+v_2=1.8$ overshoots the edge value $1$, shared equally between the two coordinates; check: $0.6+0.4=1$`),
+        ],
       },
     ],
     callouts: [

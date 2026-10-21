@@ -115,7 +115,7 @@ const sections: Section[] = [
     title: 'The ridge objective',
     why: R`To find the ridge weights we need $L_{\text{ridge}}$ as one formula in $\mathbf w$. Expanding it shows it is the least-squares loss plus one extra quadratic term, so the gradient will be the old one plus one new piece.`,
     slides: [slide('I', 55, 'Ridge regression')],
-    slideNote: 'Rows 2 and 3 are added: they expand the norms exactly as in the matrix least-squares topic.',
+    slideNote: 'Rows 2 to 5 are added: they expand the norms exactly as in the matrix least-squares topic, one step at a time.',
     display: ridgeObjective,
     derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
@@ -134,9 +134,23 @@ const sections: Section[] = [
         notes: [tag(['I1'], 'both squared norms become a vector dotted with itself')],
       },
       {
+        eq: R`=(\mathbf y^\top-\mathbf w^\top X^\top)(\mathbf y-X\mathbf w)+\lambda\,\mathbf w^\top\mathbf w`,
+        notes: [
+          tag(['I2'], R`transpose of the first bracket: $(\mathbf y-X\mathbf w)^\top=\mathbf y^\top-(X\mathbf w)^\top=\mathbf y^\top-\mathbf w^\top X^\top$`),
+          shape(R`(1\times N)(N\times1)=1\times1`),
+        ],
+      },
+      {
+        eq: R`=\mathbf y^\top\mathbf y-\mathbf y^\top X\mathbf w-\mathbf w^\top X^\top\mathbf y+\mathbf w^\top X^\top X\mathbf w+\lambda\,\mathbf w^\top\mathbf w`,
+        notes: [
+          ex(R`multiply the two brackets term by term; the product of the two minus signs in the last term gives $+$`),
+          shape(R`\text{each term: }1\times1`),
+        ],
+      },
+      {
         eq: R`=\htmlClass{c-orange}{\mathbf y^\top\mathbf y}-2\,\mathbf y^\top X\mathbf w+\mathbf w^\top X^\top X\mathbf w+\lambda\,\mathbf w^\top\mathbf w`,
         notes: [
-          tag(['I2', 'I3'], R`multiply out; the two cross terms are equal scalars, so they combine to $-2\,\mathbf y^\top X\mathbf w$`),
+          tag(['I2', 'I3'], R`$\mathbf w^\top X^\top\mathbf y$ is a scalar, so it equals its transpose $(\mathbf w^\top X^\top\mathbf y)^\top=\mathbf y^\top X\mathbf w$; the two cross terms are equal scalars, so they combine to $-2\,\mathbf y^\top X\mathbf w$`),
           con(R`$\mathbf y^\top\mathbf y$ has no $\mathbf w$: constant`),
           shape(R`\text{each term: }1\times1`),
         ],
@@ -148,7 +162,7 @@ const sections: Section[] = [
     title: 'Centring and the unpenalised intercept',
     why: R`Penalising $w_0$ would pull the whole fit towards $y=0$, so the answer would change if every target were shifted by a constant. Centring the data and leaving the intercept out of the penalty keeps the shrinkage on the slopes only.`,
     slides: [slide('I', 55, 'Ridge regression'), slide('I', 57, 'Stronger regularisation restricts good fits')],
-    slideNote: R`The slide gives the three instructions in rows 1, 2 (label) and 4. Rows 2 and 3 are added to show why they fit together: with centred data the best unpenalised intercept is 0, so $X$ can drop its column of 1s.`,
+    slideNote: R`The slide gives the three instructions in the first row, the label of the second row, and the last row. The other rows are added to show why they fit together: with centred data the best unpenalised intercept is 0, so $X$ can drop its column of 1s.`,
     derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
@@ -166,11 +180,37 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`\hat w_0=\frac1N\sum_i\tilde y_i-\mathbf w^\top\frac1N\sum_i\tilde{\mathbf x}_i=0-\mathbf w^\top\mathbf 0=0`,
+        eq: R`\sum_{i=1}^{N}\tilde y_i-Nw_0-\mathbf w^\top\sum_{i=1}^{N}\tilde{\mathbf x}_i=0\ \Rightarrow\ \hat w_0=\frac1N\sum_{i=1}^{N}\tilde y_i-\mathbf w^\top\frac1N\sum_{i=1}^{N}\tilde{\mathbf x}_i`,
         notes: [
-          tag(['I16'], R`split the sum; $\sum_i w_0=Nw_0$; $\mathbf w^\top$ comes out`),
+          ex(R`the factor $-2$ is divided out; then split the sum into three sums`),
+          tag(['I16'], R`$\sum_i w_0=Nw_0$; $\mathbf w^\top$ is constant in $i$, so it comes out; then divide by $N$ and move the other terms across`),
+        ],
+      },
+      {
+        eq: R`\sum_{i=1}^{N}\tilde y_i=\sum_{i=1}^{N}(y_i-\bar y)=\sum_{i=1}^{N}y_i-N\bar y=N\bar y-N\bar y=0`,
+        notes: [
+          tag(['I16'], R`$\sum_i\bar y=N\bar y$ because $\bar y$ does not depend on $i$; and $\sum_iy_i=N\bar y$ by the definition of the mean`),
+          shape(R`1\times1`),
+        ],
+      },
+      {
+        eq: R`\sum_{i=1}^{N}\tilde{\mathbf x}_i=\sum_{i=1}^{N}(\mathbf x_i-\bar{\mathbf x})=N\bar{\mathbf x}-N\bar{\mathbf x}=\mathbf 0`,
+        notes: [
+          ex(R`same argument, coordinate by coordinate`),
+          shape(R`\mathbf 0:\ D\times1`),
+        ],
+      },
+      {
+        eq: R`\hat w_0=\frac1N\cdot0-\mathbf w^\top\frac1N\cdot\mathbf 0=0-\mathbf w^\top\mathbf 0=0`,
+        notes: [
           lab('centred values sum to zero, so the best intercept is 0'),
           warn(R`so in $L_{\text{ridge}}$, $X$ is the centred $N\times D$ matrix with no column of 1s and $\mathbf y$ is the centred target vector $\tilde{\mathbf y}$`),
+        ],
+      },
+      {
+        eq: R`\hat{\tilde y}=\hat w_0+\hat{\mathbf w}^\top\tilde{\mathbf x}=\hat{\mathbf w}^\top(\mathbf x-\bar{\mathbf x})\ \Rightarrow\ \hat y=\hat{\tilde y}+\bar y`,
+        notes: [
+          ex(R`a prediction for a centred target is $\hat w_0+\hat{\mathbf w}^\top\tilde{\mathbf x}$ with $\hat w_0=0$; to get back to the original scale, add back the mean that was subtracted from the targets`),
         ],
       },
       {
@@ -189,7 +229,7 @@ const sections: Section[] = [
     title: 'Gradient of the ridge objective',
     why: R`As in least squares, the best $\mathbf w$ is where the gradient is zero. The fit term gives the gradient we already know; the penalty adds just $2\lambda\mathbf w$.`,
     slides: [slide('I', 56, 'Ridge: the parameter estimate'), slide('II', 3, 'Ridge regression')],
-    slideNote: 'Deck II slide 3 repeats deck I slide 56. Rows 1 to 4 are added to show each identity; row 5 is the slide.',
+    slideNote: 'Deck II slide 3 repeats deck I slide 56. All rows but the last are added to show each identity; the last row is the slide.',
     derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
@@ -207,9 +247,16 @@ const sections: Section[] = [
         ],
       },
       {
+        eq: R`\frac{\partial}{\partial w_j}\,\mathbf w^\top\mathbf w=\frac{\partial}{\partial w_j}\sum_{k=1}^{D}w_k^2=2w_j\ \Rightarrow\ \nabla_{\mathbf w}(\mathbf w^\top\mathbf w)=2\mathbf w`,
+        notes: [
+          ex(R`in the sum only the term $k=j$ contains $w_j$, and $\partial(w_j^2)/\partial w_j=2w_j$; stack the $D$ entries into a column`),
+          shape(R`2\mathbf w:\ D\times1`),
+        ],
+      },
+      {
         eq: R`\lambda\,\nabla_{\mathbf w}(\mathbf w^\top\mathbf w)=2\lambda\mathbf w`,
         notes: [
-          tag(['I20'], R`write $\mathbf w^\top\mathbf w=\mathbf w^\top I\mathbf w$ and use I5 with the symmetric $A=I$`),
+          tag(['I20'], R`the same result from $\mathbf w^\top\mathbf w=\mathbf w^\top I\mathbf w$ and I5 with the symmetric $A=I$; $\lambda$ is a constant factor`),
           shape(R`2\lambda\mathbf w:\ D\times1`),
         ],
       },
@@ -232,7 +279,7 @@ const sections: Section[] = [
     title: 'Solve for the ridge estimate',
     why: R`Setting the gradient to zero gives a linear equation in $\hat{\mathbf w}$, like the Normal Equation but with $\lambda I$ added. That extra term is what guarantees one unique answer, even when least squares alone has many.`,
     slides: [slide('I', 56, 'Ridge: the parameter estimate'), slide('II', 3, 'Ridge regression')],
-    slideNote: 'Rows 2 to 4 are added to show the rearranging; rows 5 and 6 are the slide.',
+    slideNote: 'The middle rows are added to show the rearranging; the last two rows are the slide.',
     derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
@@ -241,11 +288,14 @@ const sections: Section[] = [
       },
       {
         eq: R`-X^\top\mathbf y+X^\top X\hat{\mathbf w}+\lambda\hat{\mathbf w}=\mathbf 0`,
-        notes: [ex('divide by 2'), tag(['I21'], R`multiply $X^\top$ into the bracket`)],
+        notes: [
+          ex('divide both sides by 2'),
+          tag(['I21'], R`multiply $X^\top$ into the bracket: $X^\top(\mathbf y-X\hat{\mathbf w})=X^\top\mathbf y-X^\top X\hat{\mathbf w}$, so $-X^\top(\mathbf y-X\hat{\mathbf w})=-X^\top\mathbf y+X^\top X\hat{\mathbf w}$`),
+        ],
       },
       {
         eq: R`X^\top X\hat{\mathbf w}+\lambda\hat{\mathbf w}=X^\top\mathbf y`,
-        notes: [ex(R`move $X^\top\mathbf y$ to the right`)],
+        notes: [ex(R`add $X^\top\mathbf y$ to both sides`)],
       },
       {
         eq: R`X^\top X\hat{\mathbf w}+\lambda I\hat{\mathbf w}=X^\top\mathbf y`,
@@ -260,6 +310,13 @@ const sections: Section[] = [
           tag(['I21'], R`factor $\hat{\mathbf w}$ out on the RIGHT`),
           lab(R`$I$ is the identity matrix`),
           shape(R`\big[(D\times D)+(D\times D)\big](D\times1)=(D\times N)(N\times1)=D\times1`),
+        ],
+      },
+      {
+        eq: R`(X^\top X+\lambda I)^{-1}(X^\top X+\lambda I)\,\hat{\mathbf w}=(X^\top X+\lambda I)^{-1}X^\top\mathbf y\ \Rightarrow\ I\,\hat{\mathbf w}=(X^\top X+\lambda I)^{-1}X^\top\mathbf y`,
+        notes: [
+          ex(R`multiply both sides on the LEFT by the inverse; the left side collapses because $A^{-1}A=I$`),
+          shape(R`I:\ D\times D`),
         ],
       },
       {
@@ -283,14 +340,14 @@ const sections: Section[] = [
       {
         heading: 'Exam trap',
         flag: 'I24',
-        text: R`The inverse does not split over the sum.`,
+        text: R`The inverse does not split over the sum. Check with $D=1$, $X^\top X=1$, $\lambda=1$: the left side is $(1+1)^{-1}=\tfrac12$ but the right side is $1^{-1}+\tfrac11\cdot1=2$.`,
         eq: R`(X^\top X+\lambda I)^{-1}\ne(X^\top X)^{-1}+\tfrac1\lambda I`,
       },
       {
         heading: 'Hidden step: why is the solution unique for any data?',
         flag: 'I23',
-        text: R`For $\lambda>0$, $X^\top X+\lambda I$ is positive definite even when $X$ does not have full column rank (for example more features than examples). So $L_{\text{ridge}}$ is a strictly convex bowl with exactly one lowest point.`,
-        eq: R`\mathbf v^\top(X^\top X+\lambda I)\mathbf v=\lVert X\mathbf v\rVert_2^2+\lambda\lVert\mathbf v\rVert_2^2>0\quad(\mathbf v\ne\mathbf 0)`,
+        text: R`For $\lambda>0$, $X^\top X+\lambda I$ is positive definite even when $X$ does not have full column rank (for example more features than examples). So $L_{\text{ridge}}$ is a strictly convex bowl with exactly one lowest point. Why $>0$: $\lVert X\mathbf v\rVert_2^2\ge0$ is a sum of squares, and $\lambda\lVert\mathbf v\rVert_2^2=\lambda\sum_kv_k^2>0$ because $\lambda>0$ and some $v_k\ne0$; non-negative plus positive is positive.`,
+        eq: R`\mathbf v^\top(X^\top X+\lambda I)\mathbf v=\mathbf v^\top X^\top X\mathbf v+\lambda\,\mathbf v^\top\mathbf v=\lVert X\mathbf v\rVert_2^2+\lambda\lVert\mathbf v\rVert_2^2>0\quad(\mathbf v\ne\mathbf 0)`,
       },
     ],
   },

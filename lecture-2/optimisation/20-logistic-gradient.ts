@@ -41,7 +41,7 @@ const sections: Section[] = [
     title: 'Differentiating cross-entropy',
     why: R`Every optimiser needs the gradient of the loss. Working one coefficient $w_j$ at a time with the chain rule turns the cross-entropy into a remarkably short result: (prediction minus label) times input, summed over examples.`,
     slides: [slide('L2', 37, 'Differentiating cross-entropy')],
-    slideNote: R`Row 3 (where $\partial p_i/\partial w_j$ comes from) and row 5 (the expansion before cancelling) are added to show each step.`,
+    slideNote: R`The rows deriving $g'$, $\partial z_i/\partial w_j$ and $\partial p_i/\partial w_j$, and the rows for the algebra before and after cancelling, are added to show each step.`,
     derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
@@ -52,11 +52,30 @@ const sections: Section[] = [
         ],
       },
       {
+        eq: R`\frac{\partial}{\partial p_i}\Big[y_i\log p_i+(1-y_i)\log(1-p_i)\Big]=y_i\cdot\frac{1}{p_i}+(1-y_i)\cdot\frac{-1}{1-p_i}=\frac{y_i}{p_i}-\frac{1-y_i}{1-p_i}`,
+        notes: [
+          tag(['I37', 'I15'], R`$\frac{d}{dp}\log p=\frac1p$; for $\log(1-p)$ the chain rule gives $\frac{1}{1-p}$ times the inner derivative $-1$`),
+          con(R`$y_i$ is a constant factor`),
+          shape(R`1\times1`),
+        ],
+      },
+      {
         eq: R`\frac{\partial L}{\partial w_j}=-\sum_{i=1}^{N}\Big[\frac{y_i}{p_i}-\frac{1-y_i}{1-p_i}\Big]\frac{\partial p_i}{\partial w_j}`,
         notes: [
           tag(['I8', 'I37', 'I15'], R`differentiate term by term; $\frac{d}{dp}\log p=\frac1p$ and $\frac{d}{dp}\log(1-p)=-\frac{1}{1-p}$ (chain rule, inner derivative $-1$)`),
           shape(R`\partial L/\partial w_j:\ 1\times1\ \text{(one entry of the gradient)}`),
         ],
+      },
+      {
+        eq: R`g'(a)=\frac{d}{da}(1+e^{-a})^{-1}=-(1+e^{-a})^{-2}\cdot(-e^{-a})=\frac{e^{-a}}{(1+e^{-a})^2}=\frac{1}{1+e^{-a}}\cdot\frac{e^{-a}}{1+e^{-a}}=g(a)\,[1-g(a)]`,
+        notes: [
+          tag(['I69', 'I15', 'I37'], R`power rule $\frac{d}{dv}v^{-1}=-v^{-2}$ with inner function $v=1+e^{-a}$, whose derivative is $-e^{-a}$`),
+          tag(['I64'], R`$\frac{e^{-a}}{1+e^{-a}}=1-g(a)$`),
+        ],
+      },
+      {
+        eq: R`\frac{\partial z_i}{\partial w_j}=\frac{\partial}{\partial w_j}\sum_{k=0}^{D}w_kx_{ik}=x_{ij}`,
+        notes: [tag(['I70'], R`only the term $k=j$ contains $w_j$; the other terms are constants`)],
       },
       {
         eq: R`\frac{\partial p_i}{\partial w_j}=g'(z_i)\,\frac{\partial z_i}{\partial w_j}=p_i(1-p_i)\,x_{ij}`,
@@ -70,8 +89,16 @@ const sections: Section[] = [
         notes: [lab('substitute row 3 into row 2')],
       },
       {
+        eq: R`\Big[\frac{y_i}{p_i}-\frac{1-y_i}{1-p_i}\Big]p_i(1-p_i)=\frac{y_i}{p_i}\,p_i(1-p_i)-\frac{1-y_i}{1-p_i}\,p_i(1-p_i)=y_i(1-p_i)-(1-y_i)\,p_i`,
+        notes: [lab(R`distribute $p_i(1-p_i)$ over the bracket: in the first term the $p_i$ cancels, in the second the $1-p_i$ cancels`)],
+      },
+      {
         eq: R`=-\sum_{i=1}^{N}\big[y_i(1-p_i)-(1-y_i)p_i\big]x_{ij}=-\sum_{i=1}^{N}\big[y_i-\cancel{y_ip_i}-p_i+\cancel{y_ip_i}\big]x_{ij}`,
-        notes: [lab(R`the $p_i$ and $1-p_i$ cancel against the denominators; then multiply out`)],
+        notes: [lab(R`multiply out: $y_i(1-p_i)=y_i-y_ip_i$ and $(1-y_i)p_i=p_i-y_ip_i$, so minus the second gives $-p_i+y_ip_i$; the two $y_ip_i$ terms cancel`)],
+      },
+      {
+        eq: R`=-\sum_{i=1}^{N}(y_i-p_i)\,x_{ij}=\sum_{i=1}^{N}(p_i-y_i)\,x_{ij}`,
+        notes: [lab(R`what is left in the bracket is $y_i-p_i$; the minus sign in front flips it to $p_i-y_i$`)],
       },
       {
         eq: R`\frac{\partial L}{\partial w_j}=\sum_{i=1}^{N}(p_i-y_i)\,x_{ij}`,
@@ -96,7 +123,14 @@ const sections: Section[] = [
         notes: [lab(R`$p_i$: predicted probability; $y_i$: observed label; $z_i$: the score; $\ell_i$: its loss`)],
       },
       {
-        eq: R`\frac{\partial\ell_i}{\partial z_i}=p_i-y_i,\qquad \nabla_{\mathbf w}\ell_i=(p_i-y_i)\,\mathbf x_i`,
+        eq: R`\frac{\partial\ell_i}{\partial p_i}=-\frac{y_i}{p_i}+\frac{1-y_i}{1-p_i}=\frac{-y_i(1-p_i)+(1-y_i)p_i}{p_i(1-p_i)}=\frac{p_i-y_i}{p_i(1-p_i)},\qquad \frac{\partial p_i}{\partial z_i}=g'(z_i)=p_i(1-p_i)`,
+        notes: [
+          ex(R`common denominator $p_i(1-p_i)$; numerator $-y_i+y_ip_i+p_i-y_ip_i=p_i-y_i$`),
+          tag(['I69'], R`$g'=g(1-g)$`),
+        ],
+      },
+      {
+        eq: R`\frac{\partial\ell_i}{\partial z_i}=\frac{\partial\ell_i}{\partial p_i}\cdot\frac{\partial p_i}{\partial z_i}=\frac{p_i-y_i}{p_i(1-p_i)}\cdot p_i(1-p_i)=p_i-y_i,\qquad \nabla_{\mathbf w}\ell_i=(p_i-y_i)\,\mathbf x_i`,
         notes: [
           tag(['I70'], R`$\nabla_{\mathbf w}\ell_i=\frac{\partial\ell_i}{\partial z_i}\nabla_{\mathbf w}z_i$ and $\nabla_{\mathbf w}z_i=\mathbf x_i$`),
           tag(['C1'], 'the gradient has the shape of w'),
@@ -106,6 +140,13 @@ const sections: Section[] = [
       {
         eq: R`L(\mathbf w)=\sum_{i=1}^{N}\ell_i,\qquad \nabla L(\mathbf w)=\sum_{i=1}^{N}(p_i-y_i)\,\mathbf x_i`,
         notes: [tag(['I8'], 'the gradient of a sum is the sum of the gradients')],
+      },
+      {
+        eq: R`\big[\nabla L(\mathbf w)\big]_j=\sum_{i=1}^{N}(p_i-y_i)\,x_{ij}=\sum_{i=1}^{N}X_{ij}\,(\mathbf p-\mathbf y)_i=\big[X^\top(\mathbf p-\mathbf y)\big]_j`,
+        notes: [
+          tag(['I17'], R`entry $j$ of $X^\top\mathbf a$ is column $j$ of $X$ dotted with $\mathbf a$, i.e. $\sum_iX_{ij}a_i$, here with $\mathbf a=\mathbf p-\mathbf y$`),
+          shape(R`\text{entry }j:\ 1\times1`),
+        ],
       },
       {
         eq: R`\nabla L(\mathbf w)=X^\top(\mathbf p-\mathbf y)`,
@@ -122,7 +163,7 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`\mathbf x_i=(1,2)^\top,\ y_i=1,\ \mathbf w=(0,0)^\top:\quad p_i=g(0)=0.5,\quad\nabla\ell_i=(0.5-1)(1,2)^\top=(-0.5,-1)^\top`,
+        eq: R`\mathbf x_i=(1,2)^\top,\ y_i=1,\ \mathbf w=(0,0)^\top:\quad z_i=0\cdot1+0\cdot2=0,\quad p_i=g(0)=\frac{1}{1+e^{0}}=0.5,\quad\nabla\ell_i=(0.5-1)\begin{bmatrix}1\\2\end{bmatrix}=\begin{bmatrix}-0.5\\-1\end{bmatrix}`,
         notes: [ex('the gradient points away from the label; stepping against it raises the score of this positive example')],
       },
     ],
@@ -131,7 +172,7 @@ const sections: Section[] = [
         heading: 'Same shape as least squares',
         flag: 'I71',
         text: R`The least-squares gradient (Lecture 1) is also "prediction minus target, times input". The difference is that the logistic prediction $g(\mathbf w^\top\mathbf x_i)$ is nonlinear in $\mathbf w$, so setting the gradient to zero cannot be solved by one matrix inversion.`,
-        eq: R`\text{LS: }\nabla L=2X^\top(X\mathbf w-\mathbf y),\qquad\text{logistic: }\nabla L=X^\top\big(g(X\mathbf w)-\mathbf y\big)`,
+        eq: R`\text{LS: }\nabla L=-2X^\top\mathbf y+2X^\top X\mathbf w=2X^\top(X\mathbf w-\mathbf y),\qquad\text{logistic: }\nabla L=X^\top\big(g(X\mathbf w)-\mathbf y\big)`,
       },
     ],
   },

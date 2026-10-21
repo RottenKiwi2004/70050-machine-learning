@@ -66,12 +66,18 @@ const sections: Section[] = [
         notes: [lab('gradient descent on the penalised mean loss')],
       },
       {
-        eq: R`\nabla J(\mathbf w)=\frac1N\sum_{i=1}^{N}\nabla\ell_i(\mathbf w)+\lambda\,\mathbf r(\mathbf w)`,
+        eq: R`\nabla J(\mathbf w)=\nabla\Big[\frac1N\sum_{i=1}^{N}\ell_i(\mathbf w)\Big]+\nabla\Big[\frac\lambda2\sum_{j=1}^{D}w_j^2\Big]=\frac1N\sum_{i=1}^{N}\nabla\ell_i(\mathbf w)+\lambda\,\mathbf r(\mathbf w)`,
         notes: [
           lab('average the example gradients, then add the penalty gradient'),
           tag(['I8'], 'the gradient of a sum is the sum of gradients'),
           lab(R`$\nabla\ell_i$ is an individual example's gradient, e.g. $(p_i-y_i)\mathbf x_i$ for logistic regression`),
           shape(R`\nabla\ell_i,\ \mathbf r,\ \nabla J:\ (D+1)\times1`),
+        ],
+      },
+      {
+        eq: R`\frac{\partial}{\partial w_j}\Big[\frac\lambda2\sum_{k=1}^{D}w_k^2\Big]=\frac\lambda2\cdot2w_j=\lambda w_j\ (j\ge1),\qquad \frac{\partial}{\partial w_0}\Big[\frac\lambda2\sum_{k=1}^{D}w_k^2\Big]=0`,
+        notes: [
+          ex(R`only the term $k=j$ contains $w_j$; $\frac{d}{dw}w^2=2w$. The sum has no $w_0$ in it, so the intercept entry is $0$`),
         ],
       },
       {
@@ -110,7 +116,14 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`\mathbb E[\mathbf g_t\mid\mathbf w_t]=\nabla J(\mathbf w_t)`,
+        eq: R`\mathbb E[\mathbf g_t\mid\mathbf w_t]=\frac1B\sum_{b=1}^{B}\mathbb E\big[\nabla\ell_{i_b}(\mathbf w_t)\big]+\lambda\mathbf r(\mathbf w_t)=\frac1B\cdot B\cdot\frac1N\sum_{i=1}^{N}\nabla\ell_i(\mathbf w_t)+\lambda\mathbf r(\mathbf w_t)`,
+        notes: [
+          tag(['I25'], R`expectation of a sum is the sum of expectations, and the constant factor $\frac1B$ comes out; $\lambda\mathbf r(\mathbf w_t)$ is not random`),
+          tag(['I79'], R`each drawn index is uniform, so $\mathbb E[\nabla\ell_{i_b}]=\frac1N\sum_i\nabla\ell_i$ for every one of the $B$ draws`),
+        ],
+      },
+      {
+        eq: R`\mathbb E[\mathbf g_t\mid\mathbf w_t]=\frac1N\sum_{i=1}^{N}\nabla\ell_i(\mathbf w_t)+\lambda\mathbf r(\mathbf w_t)=\nabla J(\mathbf w_t)`,
         notes: [
           tag(['I79', 'I25'], 'uniform sampling gives the full gradient on average'),
           warn('each update is noisy'),
@@ -124,7 +137,7 @@ const sections: Section[] = [
     title: 'SGD and coefficient shrinkage',
     why: R`Writing the SGD update one coordinate at a time shows what the L2 penalty does: before each data step it multiplies every non-intercept coefficient by a number slightly below 1. This is the "weight decay" view of ridge.`,
     slides: [slide('L2', 65, 'SGD and coefficient shrinkage')],
-    slideNote: R`Rows 2 and 3 show the steps from $\mathbf g_t$ to the slide's last line. The intercept row is added.`,
+    slideNote: R`The middle rows show the steps from $\mathbf g_t$ to the slide's last line. The intercept row is added.`,
     derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
@@ -136,7 +149,7 @@ const sections: Section[] = [
         notes: [lab(R`entry $j$ of the update, $j\ge1$ (entry $j$ of $\mathbf r$ is $w_j$)`), shape(R`\text{all terms }1\times1`)],
       },
       {
-        eq: R`w_{t+1,j}=(1-\eta_t\lambda)\,w_{t,j}-\eta_t\frac1B\sum_{i\in\mathcal B_t}\frac{\partial\ell_i}{\partial w_j}(\mathbf w_t),\qquad j\ge1`,
+        eq: R`w_{t+1,j}=w_{t,j}-\eta_t\lambda\,w_{t,j}-\eta_t\frac1B\sum_{i\in\mathcal B_t}\frac{\partial\ell_i}{\partial w_j}(\mathbf w_t)=(1-\eta_t\lambda)\,w_{t,j}-\eta_t\frac1B\sum_{i\in\mathcal B_t}\frac{\partial\ell_i}{\partial w_j}(\mathbf w_t),\qquad j\ge1`,
         notes: [
           lab(R`collect the two $w_{t,j}$ terms`),
           term('Shrinkage (weight decay)'),
@@ -148,7 +161,7 @@ const sections: Section[] = [
         notes: [lab(R`the intercept has no penalty, so no shrink factor`)],
       },
       {
-        eq: R`\eta_t=0.1,\ \lambda=0.01:\quad 1-\eta_t\lambda=0.999`,
+        eq: R`\eta_t=0.1,\ \lambda=0.01:\quad 1-\eta_t\lambda=1-0.1\times0.01=1-0.001=0.999`,
         notes: [ex('each step keeps 99.9% of every non-intercept coefficient before the data step')],
       },
     ],
@@ -172,7 +185,7 @@ const sections: Section[] = [
         eq: R`\frac{N}{B}\ \text{updates}\ \approx\ \text{one epoch-equivalent}`,
         notes: [
           lab(R`with replacement, $N/B$ updates process $N$ sampled examples`),
-          ex(R`$N=10^6$, $B=100$: $10^4$ cheap updates for the cost of one full-gradient update`),
+          ex(R`$N=10^6$, $B=100$: $N/B=\frac{10^6}{10^2}=10^4$ cheap updates for the cost of one full-gradient update`),
           warn('more updates do not imply the same factor of speedup'),
         ],
       },
@@ -211,15 +224,19 @@ const sections: Section[] = [
         notes: [tag(['I73'], 'the same one-parameter example as in the gradient-descent topic')],
       },
       {
-        eq: R`\eta=0.1:\quad w_t=2(0.9)^t,\qquad w_{14}=0.458`,
+        eq: R`\eta=0.1:\quad w_t=(1-0.1)^t\,2=2(0.9)^t,\qquad w_{14}=2(0.9)^{14}=2(0.229)=0.458`,
         notes: [lab('small constant rate: creeps down one side of the bowl, still far from 0')],
       },
       {
-        eq: R`\eta=1.8:\quad w_t=2(-0.8)^t:\ 2,\,-1.6,\,1.28,\,-1.02,\dots,\ w_{14}=0.088`,
+        eq: R`\eta=1.8:\quad w_t=2(1-1.8)^t=2(-0.8)^t:\ 2,\ 2(-0.8)=-1.6,\ -1.6(-0.8)=1.28,\ 1.28(-0.8)=-1.02,\dots,\ w_{14}=2(0.8)^{14}=2(0.044)=0.088`,
         notes: [lab('large constant rate: bounces from side to side')],
       },
       {
-        eq: R`\eta_t=\frac{1.8}{1+t/4}:\quad 2,\ -1.6,\ 0.704,\ -0.141,\ 0.004,\ \dots`,
+        eq: R`\eta_t=\frac{1.8}{1+t/4}:\quad\eta_0=1.8,\ \eta_1=\frac{1.8}{1.25}=1.44,\ \eta_2=\frac{1.8}{1.5}=1.2,\ \eta_3=\frac{1.8}{1.75}=1.029`,
+        notes: [ex(R`evaluate the schedule at $t=0,1,2,3$`)],
+      },
+      {
+        eq: R`w_1=(1-1.8)(2)=-1.6,\quad w_2=(1-1.44)(-1.6)=0.704,\quad w_3=(1-1.2)(0.704)=-0.141,\quad w_4=(1-1.029)(-0.141)=0.004`,
         notes: [lab('decreasing rate: one big bounce, then lands almost at once')],
       },
       {

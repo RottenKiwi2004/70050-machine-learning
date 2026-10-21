@@ -112,7 +112,14 @@ const sections: Section[] = [
     derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
-        eq: R`\log L(\boldsymbol\theta)=\sum_{n=1}^{N}\log p(x_n;\boldsymbol\theta)`,
+        eq: R`\log L(\boldsymbol\theta)=\log\big[p(x_1;\boldsymbol\theta)\,p(x_2;\boldsymbol\theta)\cdots p(x_N;\boldsymbol\theta)\big]=\log p(x_1;\boldsymbol\theta)+\log p(x_2;\boldsymbol\theta)+\dots+\log p(x_N;\boldsymbol\theta)`,
+        notes: [
+          ex(R`write the product out, then apply $\log(ab)=\log a+\log b$ once per factor`),
+          warn(R`every $p(x_n;\boldsymbol\theta)>0$ is needed for the log to exist`),
+        ],
+      },
+      {
+        eq: R`=\sum_{n=1}^{N}\log p(x_n;\boldsymbol\theta)`,
         notes: [
           term('Log-likelihood'),
           tag(['I34'], 'log of a product: a product becomes a sum'),
@@ -143,7 +150,7 @@ const sections: Section[] = [
       slide('II', 17, 'Gaussian maximum likelihood estimates'),
       slide('II', 15, 'The one-dimensional Gaussian distribution'),
     ],
-    slideNote: R`Slide 17 states the final $C(\mu,\sigma^2)$. Rows 1 to 3 are added to show how it comes from the slide 15 density.`,
+    slideNote: R`Slide 17 states the final $C(\mu,\sigma^2)$. The other rows are added to show, step by step, how it comes from the slide 15 density.`,
     pre: [text(R`Fit a Gaussian to $N$ scalar observations. The parameters are $\boldsymbol\theta=(\mu,\sigma^2)$.`)],
     derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
@@ -155,10 +162,16 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`\log p(x_n;\mu,\sigma^2)=-\tfrac12\log(2\pi\sigma^2)-\frac{(x_n-\mu)^2}{2\sigma^2}`,
+        eq: R`\log p(x_n;\mu,\sigma^2)=\log\frac{1}{\sqrt{2\pi\sigma^2}}+\log\exp\!\Big[-\frac{(x_n-\mu)^2}{2\sigma^2}\Big]`,
         notes: [
           tag(['I34'], 'log of (factor times exp) is log of factor plus log of exp'),
-          tag(['I36'], R`$\log\frac{1}{\sqrt{a}}=-\tfrac12\log a$, and $\log e^{u}=u$`),
+        ],
+      },
+      {
+        eq: R`=-\log\sqrt{2\pi\sigma^2}-\frac{(x_n-\mu)^2}{2\sigma^2}=-\tfrac12\log(2\pi\sigma^2)-\frac{(x_n-\mu)^2}{2\sigma^2}`,
+        notes: [
+          tag(['I36'], R`$\log\frac1a=-\log a$; $\log\sqrt a=\log a^{1/2}=\tfrac12\log a$; and $\log e^{u}=u$`),
+          shape(R`1\times1`),
         ],
       },
       {
@@ -167,6 +180,10 @@ const sections: Section[] = [
           tag(['I34'], 'the log-likelihood is a sum over observations (previous section)'),
           lab('the minus sign flips both terms to plus'),
         ],
+      },
+      {
+        eq: R`=\sum_{n=1}^{N}\tfrac12\log(2\pi\sigma^2)+\sum_{n=1}^{N}\frac{(x_n-\mu)^2}{2\sigma^2}`,
+        notes: [tag(['I16'], 'split the sum of two terms into two sums')],
       },
       {
         eq: R`C(\mu,\sigma^2)=\frac N2\log(2\pi\sigma^2)+\frac{1}{2\sigma^2}\sum_{n=1}^{N}(x_n-\mu)^2`,
@@ -185,7 +202,7 @@ const sections: Section[] = [
     title: R`Solve for the mean`,
     why: R`The best $\mu$ is where the cost stops decreasing, so its derivative in $\mu$ is zero. Doing this by hand shows that the maximum likelihood mean is simply the average of the data.`,
     slides: [slide('II', 17, 'Gaussian maximum likelihood estimates')],
-    slideNote: R`Slide 17 gives the last form of row 4 set to zero (rows 4 and 5) and $\hat\mu$ (row 6). Rows 1 to 3 (term-by-term derivative), the first form in row 4 and the second-derivative check are added.`,
+    slideNote: R`Slide 17 gives the last form of row 4 set to zero (rows 4 and 5) and $\hat\mu$ (row 6). The term-by-term derivative rows, the first form of the derivative and the second-derivative check are added.`,
     derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
@@ -204,11 +221,17 @@ const sections: Section[] = [
         notes: [tag(['I15'], R`chain rule: outer $u^2$, inner $u=x_n-\mu$ with $\frac{\partial u}{\partial\mu}=-1$`)],
       },
       {
-        eq: R`\frac{\partial C}{\partial\mu}=-\frac{1}{\sigma^2}\sum_{n=1}^{N}(x_n-\mu)=\frac{N\mu-\sum_{n=1}^{N}x_n}{\sigma^2}`,
+        eq: R`\frac{\partial C}{\partial\mu}=0+\frac{1}{2\sigma^2}\sum_{n=1}^{N}\big[-2(x_n-\mu)\big]=-\frac{1}{\sigma^2}\sum_{n=1}^{N}(x_n-\mu)`,
         notes: [
-          lab(R`$\frac{1}{2\sigma^2}\cdot(-2)=-\frac{1}{\sigma^2}$`),
-          tag(['I16'], R`$\sum_n\mu=N\mu$, since $\mu$ does not depend on $n$`),
+          lab(R`$\frac{1}{2\sigma^2}\cdot(-2)=-\frac{1}{\sigma^2}$; the constant $-2$ comes out of the sum`),
           shape(R`\frac{\partial C}{\partial\mu}:\ 1\times1`),
+        ],
+      },
+      {
+        eq: R`=-\frac{1}{\sigma^2}\Big(\sum_{n=1}^{N}x_n-\sum_{n=1}^{N}\mu\Big)=-\frac{1}{\sigma^2}\Big(\sum_{n=1}^{N}x_n-N\mu\Big)=\frac{N\mu-\sum_{n=1}^{N}x_n}{\sigma^2}`,
+        notes: [
+          tag(['I16'], R`split the sum; $\sum_n\mu=N\mu$, since $\mu$ does not depend on $n$`),
+          ex(R`the minus sign distributes inside the bracket, swapping its two terms`),
         ],
       },
       {
@@ -228,7 +251,7 @@ const sections: Section[] = [
         heading: 'Hidden step: a minimum, not a maximum',
         flag: 'I14',
         text: R`Differentiate $\partial C/\partial\mu$ once more. The result is positive, so $C$ curves upwards in $\mu$ and the flat point $\hat\mu$ is its lowest point.`,
-        eq: R`\frac{\partial^2C}{\partial\mu^2}=\frac{N}{\sigma^2}>0`,
+        eq: R`\frac{\partial^2C}{\partial\mu^2}=\frac{\partial}{\partial\mu}\,\frac{N\mu-\sum_{n}x_n}{\sigma^2}=\frac{N-0}{\sigma^2}=\frac{N}{\sigma^2}>0`,
       },
     ],
   },
@@ -238,7 +261,7 @@ const sections: Section[] = [
     title: R`Solve for the variance`,
     why: R`The same zero-derivative recipe, now in $\sigma^2$, gives the maximum likelihood variance. The point to remember is that it divides by $N$, which the slide stresses.`,
     slides: [slide('II', 17, 'Gaussian maximum likelihood estimates')],
-    slideNote: R`Slide 17 gives only the result $\hat\sigma^2$. The derivative steps (rows 1 to 3) are added. Writing $v$ for $\sigma^2$ is only a shorthand here, not slide notation.`,
+    slideNote: R`Slide 17 gives only the result $\hat\sigma^2$. The derivative and solving steps (rows 1 to 4) are added. Writing $v$ for $\sigma^2$ is only a shorthand here, not slide notation.`,
     derive: true, // the rows as an animated derivation, drawn in the page: each line is built out of the one before
     rows: [
       {
@@ -250,15 +273,22 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`\frac{\partial C}{\partial v}=0+\frac{N}{2v}-\frac{S}{2v^2}`,
+        eq: R`\frac{\partial C}{\partial v}=0+\frac N2\cdot\frac1v+\frac S2\cdot\Big(-\frac1{v^2}\Big)=\frac{N}{2v}-\frac{S}{2v^2}`,
         notes: [
           tag(['I8'], 'differentiate term by term'),
-          tag(['I37'], R`$\frac{\mathrm d}{\mathrm dv}\log v=\frac1v$ and $\frac{\mathrm d}{\mathrm dv}\frac1v=-\frac1{v^2}$`),
+          tag(['I37'], R`$\frac{\mathrm d}{\mathrm dv}\log v=\frac1v$ and $\frac{\mathrm d}{\mathrm dv}\frac1v=-\frac1{v^2}$; the constants $\tfrac N2$ and $\tfrac S2$ stay as factors, and $\tfrac{S}{2v}=\tfrac S2\cdot\tfrac1v$`),
         ],
       },
       {
-        eq: R`\frac{N}{2v}-\frac{S}{2v^2}=0\ \Rightarrow\ Nv=S`,
-        notes: [tag(['I14'], 'set the derivative to zero'), lab(R`multiply both sides by $2v^2>0$`)],
+        eq: R`\frac{N}{2v}-\frac{S}{2v^2}=0\ \Rightarrow\ \frac{N}{2v}=\frac{S}{2v^2}\ \Rightarrow\ N\cdot2v^2=S\cdot2v\ \Rightarrow\ Nv=S`,
+        notes: [
+          tag(['I14'], 'set the derivative to zero'),
+          ex(R`move the second term across; multiply both sides by $2v^2>0$ (this clears both denominators); then divide both sides by $2v>0$`),
+        ],
+      },
+      {
+        eq: R`v=\frac{S}{N}`,
+        notes: [ex(R`divide both sides by $N$`)],
       },
       {
         eq: R`\hat\sigma^2=\frac1N\sum_{n=1}^{N}(x_n-\hat\mu)^2`,
@@ -364,7 +394,7 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`\boldsymbol\Sigma^{-1}=\operatorname{diag}\Big(\frac1{\sigma_1^2},\dots,\frac1{\sigma_d^2}\Big)`,
+        eq: R`\boldsymbol\Sigma\boldsymbol\Sigma^{-1}=\operatorname{diag}\Big(\sigma_1^2\cdot\frac1{\sigma_1^2},\dots,\sigma_d^2\cdot\frac1{\sigma_d^2}\Big)=\operatorname{diag}(1,\dots,1)=I\ \Rightarrow\ \boldsymbol\Sigma^{-1}=\operatorname{diag}\Big(\frac1{\sigma_1^2},\dots,\frac1{\sigma_d^2}\Big)`,
         notes: [
           tag(['I41'], 'inverse of a diagonal matrix: invert each entry'),
           warn(R`needs every $\sigma_j^2>0$`),
@@ -376,12 +406,25 @@ const sections: Section[] = [
         notes: [tag(['I42'], 'determinant of a diagonal matrix: product of the diagonal'), shape(R`1\times1`)],
       },
       {
-        eq: R`(\mathbf y-\boldsymbol\mu)^\top\boldsymbol\Sigma^{-1}(\mathbf y-\boldsymbol\mu)=\sum_{j=1}^{d}\frac{(y_j-\mu_j)^2}{\sigma_j^2}`,
+        eq: R`(\mathbf y-\boldsymbol\mu)^\top\boldsymbol\Sigma^{-1}(\mathbf y-\boldsymbol\mu)=\sum_{j=1}^{d}\sum_{k=1}^{d}(y_j-\mu_j)\,(\boldsymbol\Sigma^{-1})_{jk}\,(y_k-\mu_k)`,
         notes: [
-          tag(['I40'], R`diagonal $A=\boldsymbol\Sigma^{-1}$: only the $j=k$ terms survive, each weighted by $\frac1{\sigma_j^2}$`),
+          tag(['I40'], R`the quadratic form written out entry by entry, with $v_j=y_j-\mu_j$ and $A=\boldsymbol\Sigma^{-1}$`),
+        ],
+      },
+      {
+        eq: R`=\sum_{j=1}^{d}(y_j-\mu_j)\,\frac{1}{\sigma_j^2}\,(y_j-\mu_j)=\sum_{j=1}^{d}\frac{(y_j-\mu_j)^2}{\sigma_j^2}`,
+        notes: [
+          tag(['I40'], R`diagonal $A=\boldsymbol\Sigma^{-1}$: $(\boldsymbol\Sigma^{-1})_{jk}=0$ for $j\ne k$, so only the $j=k$ terms survive, each weighted by $\frac1{\sigma_j^2}$`),
           term('Variance-weighted sum of squares'),
           lab('a coordinate with large variance counts less'),
           shape(R`(1\times d)(d\times d)(d\times1)=1\times1`),
+        ],
+      },
+      {
+        eq: R`\log p(\mathbf y)=\log(2\pi)^{-d/2}+\log\lvert\boldsymbol\Sigma\rvert^{-1/2}-\tfrac12(\mathbf y-\boldsymbol\mu)^\top\boldsymbol\Sigma^{-1}(\mathbf y-\boldsymbol\mu)=-\tfrac d2\log(2\pi)-\tfrac12\log\lvert\boldsymbol\Sigma\rvert-\tfrac12(\mathbf y-\boldsymbol\mu)^\top\boldsymbol\Sigma^{-1}(\mathbf y-\boldsymbol\mu)`,
+        notes: [
+          tag(['I34', 'I36'], R`$\log$ of a product of three factors is the sum of the logs; $\log a^{k}=k\log a$ and $\log e^{u}=u$`),
+          shape(R`1\times1`),
         ],
       },
       {
@@ -394,7 +437,7 @@ const sections: Section[] = [
         ],
       },
       {
-        eq: R`\boldsymbol\Sigma=\sigma^2I\ \Longrightarrow\ \frac1{\sigma^2}\sum_{j=1}^{d}(y_j-\mu_j)^2=\frac1{\sigma^2}\lVert\mathbf y-\boldsymbol\mu\rVert_2^2`,
+        eq: R`\boldsymbol\Sigma=\sigma^2I\ \Longrightarrow\ \sigma_j^2=\sigma^2\ \text{for all }j\ \Rightarrow\ \sum_{j=1}^{d}\frac{(y_j-\mu_j)^2}{\sigma^2}=\frac1{\sigma^2}\sum_{j=1}^{d}(y_j-\mu_j)^2=\frac1{\sigma^2}\lVert\mathbf y-\boldsymbol\mu\rVert_2^2`,
         notes: [
           tag(['I41'], R`$(\sigma^2I)^{-1}=\frac1{\sigma^2}I$: every weight is the same`),
           tag(['I1'], 'a sum of squares is the squared norm'),
